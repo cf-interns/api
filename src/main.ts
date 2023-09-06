@@ -11,8 +11,8 @@ async function bootstrap() {
   const logger = new Logger("NestApplication");
   const port = configService.get<number>("app.port") ?? 3000;
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-  app.useGlobalInterceptors();
+  // app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+   app.useGlobalInterceptors();
   app.enableCors();
   app.setGlobalPrefix(configService.get<string>("app.prefix") ?? "api");
 

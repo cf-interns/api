@@ -6,7 +6,7 @@ import { Callback } from "src/domains/callback.entity";
 import { CallbackService } from "src/serviceImpl/callback.service";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Callback]), RabbitMqModule],
+  imports: [TypeOrmModule.forFeature([Callback]), RabbitMqModule,],
   controllers: [CallbackController],
   providers: [CallbackService],
   exports: [],
