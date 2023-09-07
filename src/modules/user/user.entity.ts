@@ -1,4 +1,3 @@
-import { IsEmail, IsNotEmpty } from "class-validator";
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 
@@ -7,23 +6,19 @@ export class User {
     @PrimaryGeneratedColumn('uuid')
     public _id: string;
 
-    @Column()
-    @IsNotEmpty()
+    @Column({nullable:  false})
     public firstName: string;
 
-    @Column()
-    @IsNotEmpty()
+    @Column({nullable: false})
     public lastName: string;
 
 /*     //TODO: Get FirstName
     @Column()
     public userName: string;
  */
-    @Column()
-    @IsNotEmpty()
+    @Column({nullable: false})
     public password: string;
 
     @Column({unique: true})
-    @IsEmail()
     public email: string;
 }

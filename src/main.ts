@@ -4,17 +4,25 @@ import { NestFactory } from "@nestjs/core";
 import * as Sentry from "@sentry/node";
 import { AppModule } from "./app.module";
 import { SentryInterceptor } from "./interceptors/sentry.interceptor";
+import * as cookieParser from 'cookie-parser'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+
+
+
   const configService = app.get(ConfigService);
   const logger = new Logger("NestApplication");
   const port = configService.get<number>("app.port") ?? 3000;
 
-  // app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
-   app.useGlobalInterceptors();
+
+  app.useGlobalInterceptors();
+  app.useGlobalPipes(new ValidationPipe());
+  app.use(cookieParser());
   app.enableCors();
   app.setGlobalPrefix(configService.get<string>("app.prefix") ?? "api");
+
 
   if (configService.get<boolean>("app.isStagingOrProd")) {
     // setup production tools

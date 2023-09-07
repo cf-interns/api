@@ -4,12 +4,17 @@ import * as bcrypt from 'bcrypt'
 import { RegisterDataDto } from "src/dtos/reister.dto";
 import PostgresErrorCode from "src/enums/postgresErrorCode.enum";
 import { User } from "../user/user.entity";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
+import { TokenPayload } from "./tokenPayload.interface";
 
 
 @Injectable()
 export class AuthService {
     constructor(
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly jwtService: JwtService,
+        private  readonly configService: ConfigService
     ) {}
 
     public async register(registerData: RegisterDataDto): Promise<void>{
@@ -43,6 +48,18 @@ export class AuthService {
         if (!bcryptVerify) {
             throw new HttpException('Invalid login', HttpStatus.BAD_REQUEST);
         }
+    }
+
+
+    public getCookieWithToken(userId: string) {
+        const payload: TokenPayload = {userId};
+        const acess_token = this.jwtService.sign(payload);
+        return `Auth = ${acess_token}; HttpOnly; Path=/; Max-Age${this.configService.get('jwt.expTime')}`;
+    }
+
+
+    public removeCookieForLogOut() {
+        return `Auth=; HttpOnly; Path=/; Max-Age=0`;
     }
 }
 

@@ -42,4 +42,24 @@ export class  UserService {
 
         throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
     }
+
+
+    async getById(_id: string): Promise<User> {
+        const user = await this.userRepo.findOne({
+            where: {
+                _id
+            }
+        });
+        if (user) {
+            return user;
+        };
+
+        throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
+    }
+
+    async getUsers(): Promise<User[]> {
+
+        const allUsers = await this.userRepo.find();
+        return allUsers;
+    }
 }

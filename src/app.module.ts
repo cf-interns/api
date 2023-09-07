@@ -11,6 +11,7 @@ import { CoreModule } from "./modules/core.module";
 import { UserModule } from "./modules/user/user.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import * as Joi from "joi";
+import { ApplicationModule } from "./modules/application/application.module";
 
 const ENV = process.env.NODE_ENV;
 console.log(ENV, '<====== ENV', process.cwd());
@@ -31,6 +32,7 @@ console.log(ENV, '<====== ENV', process.cwd());
     CoreModule,
     UserModule,
     AuthModule,
+    ApplicationModule,
    
   ],
   controllers: [],
