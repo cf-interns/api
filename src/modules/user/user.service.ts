@@ -6,27 +6,28 @@ import { CreateUserDto } from "src/dtos/createUser.dto";
 
 
 @Injectable()
-export class  UserService {
+export class UserService {
     constructor(
         @InjectRepository(User)
         private userRepo: Repository<User>
-    ) {}
+    ) { }
 
     async createUser(userData: CreateUserDto): Promise<void> {
+        console.log(userData);
 
-            const user = this.userRepo.create(userData);
-            console.log("userData ======>>",user);
-            
-            await this.userRepo.save(user);
+        const user = this.userRepo.create(userData);
+        // console.log("userData ======>>",user);
 
-            if (!user) {
+        await this.userRepo.save(user);
+
+        if (!user) {
             throw new HttpException('Something Went Wrong', HttpStatus.BAD_REQUEST)
-                
-            }
-            
-       
-            
-        
+
+        }
+
+
+
+
     }
 
     async getByEmail(email: string): Promise<User> {

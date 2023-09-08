@@ -4,6 +4,8 @@ import { Application } from './application.entity';
 import { Repository } from 'typeorm';
 import { ApplicationDto } from 'src/dtos/createApplication.dto';
 import { AppStatus } from './app-status.enum';
+import { User } from '../user/user.entity';
+import { id } from 'date-fns/locale';
 
 @Injectable()
 export class ApplicationService {
@@ -15,12 +17,17 @@ export class ApplicationService {
 
     async getAllApps(): Promise<Application[]> {
 
-        const allApps = await this.appRepo.find();
+        const allApps = await this.appRepo.find({relations: ['author']});
         return allApps;
     }
 
     async getAppById(_id: number): Promise<Application> {
-        const findThisApp = await this.appRepo.findOneBy({_id});
+        const findThisApp = await this.appRepo.findOne({
+            where: {
+                _id: _id,
+            },
+            relations: ['author']
+        });
 
         if (!findThisApp) {
             throw new NotFoundException('App Does Not Exist');
@@ -29,12 +36,13 @@ export class ApplicationService {
         return findThisApp;
     }
 
-    async createApplication(appDetails: ApplicationDto): Promise<Application> {
+    async createApplication(appDetails: ApplicationDto, owner: User): Promise<Application> {
         const {appName, description} = appDetails
         const app = this.appRepo.create({
             appName,
             description,
             status: AppStatus.INACTIVE,
+            author: owner
         });
 
         await this.appRepo.save(app);
@@ -49,7 +57,10 @@ export class ApplicationService {
     }
 
     async updateAppStatus(_id: number, status: AppStatus): Promise<Application> {
-        const app = await this.appRepo.findOneBy({_id});
+        const app = await this.appRepo.findOne({
+            where: {_id: _id},
+            relations: ['']
+        });
         app.status = status;
         await this.appRepo.save(app);
         return app;

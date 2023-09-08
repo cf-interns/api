@@ -19,11 +19,11 @@ export class UserController {
         return this.userService.getUsers();
     }
 
-    // @UsePipes(ValidationPipe)
-    @Post('sign_up')
+    //  @UsePipes(ValidationPipe)
+  /*   @Post('sign_up')
     async createUser(@Body() user: CreateUserDto) {
         console.log(user, 'UserData ======>>>>>>');
 
         return this.userService.createUser(user);
-    }
+    } */
 }

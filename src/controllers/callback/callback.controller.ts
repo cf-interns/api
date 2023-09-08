@@ -27,6 +27,7 @@ export class CallbackController {
       );
     } catch (e) {
       throw new HttpException(e.message, e.status);
+      
     }
   }
 }

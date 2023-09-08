@@ -1,31 +1,33 @@
-import { Body, Controller, HttpCode, Post, Req,Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, HttpCode, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { RegisterDataDto } from "src/dtos/reister.dto";
 import RequestObjectWithUser from "./requestWithUser.interface";
 import { LocalAuthGuard } from "src/guards/localAuth.guard";
 import { Response } from "express";
+import { LoginDto } from "src/dtos/login.dto";
 
 
 @Controller('auth')
 export class AuthController {
-    constructor (
+    constructor(
         private readonly authService: AuthService
-    ) {}
+    ) { }
 
     @Post('sign_up')
     async register(@Body() signUpUser: RegisterDataDto) {
         // console.log(signUpUser, "===> User");
-        
+        console.log(signUpUser);
+
         return this.authService.register(signUpUser);
     }
 
     @HttpCode(200)
     @UseGuards(LocalAuthGuard)
     @Post('sign_in')
-    async login(@Req() req: RequestObjectWithUser,) {
-        const {user} = req;
+    async login(@Req() req: RequestObjectWithUser, @Body() loginData: LoginDto) {
+        const { user } = req;
 
-      const cookie = this.authService.getCookieWithToken(user._id);
+        const cookie = this.authService.getCookieWithToken(user._id);
         req.res.setHeader('Set-Cookie', cookie);
         //local serialization
         user.password = undefined;
@@ -33,7 +35,7 @@ export class AuthController {
         return user;
     };
 
-    
+
 
     @Post('log-out')
     async logOut(@Req() req: RequestObjectWithUser, @Res() res) {

@@ -1,4 +1,4 @@
-import {
+/* import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
@@ -11,7 +11,7 @@ import { toError } from "src/common/helpers";
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(HttpExceptionFilter.name);
-  constructor() {}
+  constructor() { }
 
   async catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -22,6 +22,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     this.logger.error(message, status);
 
-    response.status(status).json(toError(message, "ERROR", status));
+    response.status(status)
+      .json(toError(message, "ERROR", status));
   }
 }
+ */

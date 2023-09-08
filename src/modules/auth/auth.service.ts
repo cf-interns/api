@@ -17,7 +17,7 @@ export class AuthService {
         private  readonly configService: ConfigService
     ) {}
 
-    public async register(registerData: RegisterDataDto): Promise<void>{
+    public async register(registerData: RegisterDataDto): Promise<object>{
           try {
             const hashPassword = await bcrypt.hash(registerData.password, 10);
              await this.userService.createUser({
@@ -31,6 +31,8 @@ export class AuthService {
                 throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
             }
           }
+
+          return {mesaage: 'User Created!'}
     }
 
     public async loginUser(email: string, password: string): Promise<User> {

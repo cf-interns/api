@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Application } from "../application/application.entity";
 
 
 @Entity()
@@ -21,4 +22,7 @@ export class User {
 
     @Column({unique: true})
     public email: string;
+
+    @OneToMany(() => Application, (app: Application) => app.author)
+    public apps?: Application[]
 }

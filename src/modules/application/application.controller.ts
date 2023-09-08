@@ -1,8 +1,11 @@
-import { Controller, Post, Body, Patch, Param, Delete, Get } from '@nestjs/common';
+import { Controller, Post, Body,Req, Patch, Param, Delete, Get, UseGuards } from '@nestjs/common';
 import { ApplicationService } from './application.service';
 import { Application } from './application.entity';
 import { ApplicationDto } from 'src/dtos/createApplication.dto';
 import { UpdateAppStatus } from 'src/dtos/updateAppStatus.dto';
+import RequestObjectWithUser from '../auth/requestWithUser.interface';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
+import { LocalAuthGuard } from 'src/guards/localAuth.guard';
 
 @Controller('application')
 export class ApplicationController {
@@ -12,7 +15,8 @@ export class ApplicationController {
     ) {}
 
     @Get()
-    async getAllApps(): Promise<Application[]> {
+    @UseGuards(JwtAuthGuard)
+    async getAllApps(@Req() req: RequestObjectWithUser): Promise<Application[]> {
         return this.appService.getAllApps();
     }
 
@@ -20,10 +24,12 @@ export class ApplicationController {
     async getAppById(@Param('id') id: number): Promise<Application> {
           return this.appService.getAppById(id);
     }
-
+    
+    
     @Post('create-app')
-    async createApplication(@Body() appDetails: ApplicationDto): Promise<Application> {
-        return this.appService.createApplication(appDetails);
+    @UseGuards(JwtAuthGuard)
+    async createApplication(@Body() appDetails: ApplicationDto, @Req() req: RequestObjectWithUser): Promise<Application> {
+        return this.appService.createApplication(appDetails, req.user);
     }
 
     @Patch(':id/status')

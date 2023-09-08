@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, Generated, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Generated, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "../user/user.entity";
 
 
 @Entity()
@@ -21,4 +22,7 @@ export class Application {
     @Column()
     @Generated('uuid')
     public token: string;
+
+    @ManyToOne(() => User, (author: User) => author.apps)
+    public author: User
 }

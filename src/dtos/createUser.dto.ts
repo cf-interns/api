@@ -1,9 +1,6 @@
 import { IsAlpha, IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class CreateUserDto {
-    @IsEmail()
-    email: string;
-
     @IsNotEmpty()
     @IsAlpha()
     @IsString()
@@ -13,6 +10,9 @@ export class CreateUserDto {
     @IsString()
     @IsAlpha()
     lastName: string;
+
+    @IsEmail()
+    email: string;
 
     @IsNotEmpty()
     @MinLength(9)

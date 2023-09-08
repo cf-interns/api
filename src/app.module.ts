@@ -5,7 +5,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import * as path from "path";
 import envConfig from "./config/env.config";
 import { typeormConfig } from "./config/typeorm.config";
-import { HttpExceptionFilter } from "./filters/http-exception.filter";
+//import { HttpExceptionFilter } from "./filters/http-exception.filter";
 import { AuthorizerMiddleware } from "./middlewares/authorizer.middleware";
 import { CoreModule } from "./modules/core.module";
 import { UserModule } from "./modules/user/user.module";
@@ -37,10 +37,10 @@ console.log(ENV, '<====== ENV', process.cwd());
   ],
   controllers: [],
   providers: [
-    {
+   /*  {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
-    },
+    }, */
   ],
 })
 export class AppModule {
