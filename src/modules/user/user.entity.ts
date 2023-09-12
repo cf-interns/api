@@ -23,6 +23,9 @@ export class User {
     @Column({unique: true})
     public email: string;
 
+    @Column({nullable: true})
+    public currentHashedRefreshToken: string;
+
     @OneToMany(() => Application, (app: Application) => app.author)
     public apps?: Application[]
 }

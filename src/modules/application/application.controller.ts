@@ -7,7 +7,7 @@ import RequestObjectWithUser from '../auth/requestWithUser.interface';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/guards/localAuth.guard';
 
-@Controller('application')
+@Controller('applications')
 export class ApplicationController {
 
     constructor(

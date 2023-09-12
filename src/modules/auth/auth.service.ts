@@ -14,25 +14,25 @@ export class AuthService {
     constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
-        private  readonly configService: ConfigService
-    ) {}
+        private readonly configService: ConfigService
+    ) { }
 
-    public async register(registerData: RegisterDataDto): Promise<object>{
-          try {
+    public async register(registerData: RegisterDataDto): Promise<object> {
+        try {
             const hashPassword = await bcrypt.hash(registerData.password, 10);
-             await this.userService.createUser({
+            await this.userService.createUser({
                 ...registerData,
                 password: hashPassword
             });
             console.log('User Created!');
-            
-          } catch (error) {
+
+        } catch (error) {
             if (error?.code === PostgresErrorCode.UniqueViolation) {
                 throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
             }
-          }
+        }
 
-          return {mesaage: 'User Created!'}
+        return { mesaage: 'User Created!' }
     }
 
     public async loginUser(email: string, password: string): Promise<User> {
@@ -46,7 +46,7 @@ export class AuthService {
     }
 
     public async verifyThisUsersPassword(password: string, passwordInDb: string) {
-        const bcryptVerify = await bcrypt.compare(password,passwordInDb);
+        const bcryptVerify = await bcrypt.compare(password, passwordInDb);
         if (!bcryptVerify) {
             throw new HttpException('Invalid login', HttpStatus.BAD_REQUEST);
         }
@@ -54,14 +54,36 @@ export class AuthService {
 
 
     public getCookieWithToken(userId: string) {
-        const payload: TokenPayload = {userId};
-        const acess_token = this.jwtService.sign(payload);
-        return `Auth = ${acess_token}; HttpOnly; Path=/; Max-Age${this.configService.get('jwt.expTime')}`;
+        const payload: TokenPayload = { userId };
+        const acess_token:any = this.jwtService.sign(payload, {
+            secret: this.configService.get('JWT_ACCESSS_TOKEN_SECRET'),
+            expiresIn: `${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}s`
+
+        });
+        return `Auth = ${acess_token}; HttpOnly; Path=/; Max-Age${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`;
+    }
+
+
+    public getCookieWithRefreshToken(userId: string) {
+        const payload: TokenPayload = { userId };
+        const refresh_token = this.jwtService.sign(payload, {
+            secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
+            expiresIn: `${this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}s`
+        });
+        const cookie = `Refresh=${refresh_token}; HttpOnly; Path=/; Max-Age${this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}`;
+         //TODO: Fiddle with path param to prevent the browser from sending the refresh_token on every req
+
+         return {
+            cookie,
+             refresh_token
+            }
+
+            
     }
 
 
     public removeCookieForLogOut() {
-        return `Auth=; HttpOnly; Path=/; Max-Age=0`;
+        return [`Auth=; HttpOnly; Path=/; Max-Age=0`, 'Refreah=; HttpOnly; Path=/; Max-Age=0'];
     }
 }
 

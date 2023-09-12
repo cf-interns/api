@@ -24,8 +24,10 @@ console.log(ENV, '<====== ENV', process.cwd());
       envFilePath:  path.resolve(process.cwd(), !ENV ? ".env" : `.env.${ENV}`)  /* '.env.dev' */,
       cache: true,
       validationSchema: Joi.object({
-        JWT_SECRET: Joi.string().required(),
-        JWT_EXPIRATION_TIME: Joi.string().required(),
+        JWT_ACCESSS_TOKEN_SECRET: Joi.string().required(),
+        JWT_ACCESS_TOKEN_EXPIRATION_TIME: Joi.string().required(),
+        JWT_REFRESH_TOKEN_SECRET: Joi.string().required(),
+        JWT_REFRESH_TOKEN_EXPIRATION_TIME: Joi.string().required(),
       })
     }),
     TypeOrmModule.forRootAsync(typeormConfig),

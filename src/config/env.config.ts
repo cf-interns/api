@@ -33,7 +33,9 @@ export default () => ({
 
   jwt: {
     secret: process.env.JWT_SECRET,
-    expTime: process.env.JWT_EXPIRATION_TIME
+    expTime: process.env.JWT_EXPIRATION_TIME,
+    refresh: process.env.JWT_REFRESH_TOKEN_SECRET,
+    refreshExpTime: process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME
   }
   
 });

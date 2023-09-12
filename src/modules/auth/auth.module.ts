@@ -22,7 +22,7 @@ import { JwtStrategy } from "./passport-strategies/jwt.strategy";
             }
             
         })
-    })],
+    }), ConfigModule],
     controllers: [AuthController],
     providers: [AuthService, LocalStrategy, JwtStrategy]
 })
