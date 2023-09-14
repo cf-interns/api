@@ -4,6 +4,7 @@ import { User } from "./user.entity";
 import { Repository } from "typeorm";
 import { CreateUserDto } from "src/dtos/createUser.dto";
 import * as bcrypt from 'bcrypt';
+import { updateUserPassword } from "./updataUserData.dto";
 
 
 @Injectable()
@@ -13,6 +14,30 @@ export class UserService {
         private userRepo: Repository<User>
         
     ) { }
+
+
+
+    async getById(_id: string): Promise<User> {
+        const user = await this.userRepo.findOne({
+            where: {
+                _id
+            }
+        });
+        if (user) {
+            return user;
+        };
+
+        throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
+    }
+
+
+    async getUsers(): Promise<User[]> {
+
+        const allUsers = await this.userRepo.find({
+            relations: ['apps']
+        });
+        return allUsers;
+    }
 
     async createUser(userData: CreateUserDto): Promise<void> {
         console.log(userData);
@@ -35,9 +60,11 @@ export class UserService {
     async getByEmail(email: string): Promise<User> {
         const getUser = await this.userRepo.findOne({
             where: {
-                email
+                email: email
             }
         });
+        console.log(email, 'Service Email');
+        
 
         if (getUser) {
             return getUser;
@@ -47,18 +74,6 @@ export class UserService {
     }
 
 
-    async getById(_id: string): Promise<User> {
-        const user = await this.userRepo.findOne({
-            where: {
-                _id
-            }
-        });
-        if (user) {
-            return user;
-        };
-
-        throw new HttpException('User does not exist', HttpStatus.NOT_FOUND);
-    }
 
     async getUserIfRefreshTokenMatches(refreshToken: string, _id: string): Promise<User> {
         const user = await this.getById(_id);
@@ -73,10 +88,12 @@ export class UserService {
         }
     }
 
-    async getUsers(): Promise<User[]> {
 
-        const allUsers = await this.userRepo.find();
-        return allUsers;
+
+    async updateUserData(_id: string, updatePasswordDto: updateUserPassword) {
+        const user = await this.getById(_id);
+        user.password = updatePasswordDto.password;
+        await this.userRepo.save(user);
     }
 
     //Save hash of Refresh_Token

@@ -6,7 +6,9 @@ import { LocalAuthGuard } from "src/guards/localAuth.guard";
 import { Response } from "express";
 import { LoginDto } from "src/dtos/login.dto";
 import { UserService } from "../user/user.service";
+import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
 
+@ApiTags('auth')
 
 @Controller('auth')
 export class AuthController {
@@ -15,7 +17,16 @@ export class AuthController {
         private readonly userService: UserService
     ) { }
 
+   
+
+    @ApiOperation({summary: 'Get a new Token upon acess_token expiration',description: 'Replace acess-token with the new refresh token in the browser cookie to prove authorization for subsequent requests to the api'})
+    @ApiResponse({
+        // type: ,
+        status: 200,
+        description: 'User Validated'
+    })
     @Get('refresh')
+    @HttpCode(200)
     refresh(@Req() req: RequestObjectWithUser) {
         const accessTokenCookie = this.authService.getCookieWithToken(req.user?._id);
         req.res.setHeader('Set-Cookie', accessTokenCookie);
@@ -23,6 +34,12 @@ export class AuthController {
 
     }
 
+    @ApiOperation({summary:'Sign up a user', description: 'Create a new user account'})
+    @ApiResponse({
+        type: RegisterDataDto,
+        status: 201,
+        description: 'Store User Data'
+    })
     @Post('sign_up')
     async register(@Body() signUpUser: RegisterDataDto) {
         // console.log(signUpUser, "===> User");
@@ -31,6 +48,14 @@ export class AuthController {
         return this.authService.register(signUpUser);
     }
 
+
+
+    @ApiOperation({summary: 'Log in a user', description: 'Validate user and login if successful'})
+    @ApiResponse({
+        type: LoginDto,
+        status: 200,
+        // description: ''
+    })
     @HttpCode(200)
     @UseGuards(LocalAuthGuard)
     @Post('sign_in')
@@ -52,6 +77,11 @@ export class AuthController {
 
 
 
+    @ApiOperation({summary: 'Logout a user', description: 'Remove user authentication token in the browser cookie'})
+    @ApiResponse({
+        status: 200,
+        // description: ''
+    })
     @Post('log-out')
     async logOut(@Req() req: RequestObjectWithUser, @Res() res) {
         await this.userService.removeRefreshToken(req.user._id);

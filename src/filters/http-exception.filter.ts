@@ -1,4 +1,4 @@
-/* import {
+ import {
   ArgumentsHost,
   Catch,
   ExceptionFilter,
@@ -26,4 +26,4 @@ export class HttpExceptionFilter implements ExceptionFilter {
       .json(toError(message, "ERROR", status));
   }
 }
- */
+ 

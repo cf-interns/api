@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { ApplicationDto } from 'src/dtos/createApplication.dto';
 import { AppStatus } from './app-status.enum';
 import { User } from '../user/user.entity';
-import { id } from 'date-fns/locale';
 
 @Injectable()
 export class ApplicationService {
@@ -15,18 +14,37 @@ export class ApplicationService {
     ) {}
 
 
-    async getAllApps(): Promise<Application[]> {
+    async getAllApps(_id: string): Promise<Application[]> {
 
-        const allApps = await this.appRepo.find({relations: ['author']});
+        const allApps = await this.appRepo.find({
+
+            relations: /* ['author'] */ {
+                author: true,
+
+            },
+            where: {
+                author: {
+                    _id: _id
+                }
+            }
+          /*   select: {
+                author: _id
+            }, */
+           /*  where: {
+                 author: _id
+            }, */
+           
+        });
         return allApps;
     }
 
-    async getAppById(_id: number): Promise<Application> {
+    async getAppById(_id: string): Promise<Application> {
         const findThisApp = await this.appRepo.findOne({
-            where: {
-                _id: _id,
-            },
-            relations: ['author']
+             where: {
+            //  _id,
+             
+            }, 
+            // relations: ['author']
         });
 
         if (!findThisApp) {
@@ -56,7 +74,7 @@ export class ApplicationService {
 
     }
 
-    async updateAppStatus(_id: number, status: AppStatus): Promise<Application> {
+    async updateAppStatus(_id: string, status: AppStatus): Promise<Application> {
         const app = await this.appRepo.findOne({
             where: {_id: _id},
             relations: ['']

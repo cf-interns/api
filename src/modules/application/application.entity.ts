@@ -5,7 +5,7 @@ import { User } from "../user/user.entity";
 @Entity()
 export class Application {
     @PrimaryGeneratedColumn()
-    public _id: number;
+    public _id: string;
 
     @Column()
     public appName: string;

@@ -9,7 +9,7 @@ import { ApplicationModule } from './application/application.module';
 @Module({
   imports: [TypeOrmModule.forFeature([Callback]), RabbitMqModule,],
   controllers: [CallbackController],
-  providers: [CallbackService],
+  providers: [CallbackService,],
   exports: [],
 })
 export class CoreModule {}

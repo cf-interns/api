@@ -6,6 +6,10 @@ import { AppModule } from "./app.module";
 import { SentryInterceptor } from "./interceptors/sentry.interceptor";
 import * as cookieParser from 'cookie-parser'
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { UserModule } from "./modules/user/user.module";
+import { AuthModule } from "./modules/auth/auth.module";
+import { PasswordModule } from "./modules/password/password.module";
+import { ApplicationModule } from "./modules/application/application.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -45,12 +49,14 @@ async function bootstrap() {
     app.useGlobalInterceptors(new SentryInterceptor());
   }
   const config = new DocumentBuilder()
-  .setTitle('GNS Backend')
-  .setDescription('Backend for GNS')
+  .setTitle('GNS')
+  .setDescription('### GNS API Overview')
   .setVersion('1.0')
-  .addTag('doc')
+  .addTag('docs')
   .build();
-const document = SwaggerModule.createDocument(app, config);
+const document = SwaggerModule.createDocument(app, config, {
+  include: [UserModule, AuthModule, PasswordModule, ApplicationModule]
+});
 SwaggerModule.setup('api', app, document);
   await app.listen(port);
 
