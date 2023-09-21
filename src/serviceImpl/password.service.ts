@@ -1,10 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Password } from './password.entity';
+import { Password } from '../domains/password.entity';
 import { Repository } from 'typeorm';
 import { MailerService } from '@nestjs-modules/mailer';
-import { ResetPasswordDto } from './restPassword.dto';
-import { UserService } from '../user/user.service';
+import { ResetPasswordDto } from '../dtos/restPassword.dto';
+import { UserService } from './user.service';
 import * as bcrypt from 'bcrypt'
 
 @Injectable()
@@ -20,7 +20,7 @@ export class PasswordService {
   async findOne(token: string) {
     return this.passwordRepo.findOne({
       where: {
-        token: token
+        token:token
       }
     });
   }
@@ -42,7 +42,7 @@ export class PasswordService {
       html: `Click <a href="${url}">here</a> to reset your password`
     });
 
-    return {message: "Please check your email for further instructions"}
+    return { message: "Please check your email for further instructions" }
 
   }
 
@@ -56,6 +56,8 @@ export class PasswordService {
     }
 
     const restPass = await this.findOne(token);
+    console.log(restPass.mail);
+    
     // const mail2 = restPass.mail;
 
     // console.log(mail2, '<<Token Object');
@@ -78,7 +80,7 @@ export class PasswordService {
       html: `This Email is to infrom you that your password has been changed! If you did not initiate this change sorry someone changed your password and we can't do $hit. JK lol! Please contact us <a href="http://localhost:5000/">@help-deskgns<a/>`
     });
 
-    return {message: 'Password Succefully Changed!'}
+    return { message: 'Password Succefully Changed!' }
 
 
   }

@@ -1,0 +1,40 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:16.0
+    ports:
+      - "5433:5433"
+    networks:
+      - postgres
+    volumes:
+      - /data/postgres:/data/postgres
+    env_file:
+      - docker.env  
+
+  pgadmin:
+    image: dpage/pgadmin4:7.6
+    networks:
+      - postgres
+    ports:
+      - "8080:80"
+    volumes:
+      - /data/pgadmin:/root/.pgadmin
+    env_file:
+      - docker.env
+
+
+  gns-api:
+    image: gns-api
+    env_file:
+      - .env.prod
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    networks:
+      - postgres    
+
+
+networks:
+  postgres:
+     driver: bridge           

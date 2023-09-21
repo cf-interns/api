@@ -1,17 +1,17 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Application } from './application.entity';
+import { Application } from '../domains/application.entity';
 import { Repository } from 'typeorm';
 import { ApplicationDto } from 'src/dtos/createApplication.dto';
-import { AppStatus } from './app-status.enum';
-import { User } from '../user/user.entity';
+import { AppStatus } from '../enums/app-status.enum';
+import { User } from '../domains/user.entity';
 
 @Injectable()
 export class ApplicationService {
     constructor(
         @InjectRepository(Application)
         private readonly appRepo: Repository<Application>
-    ) {}
+    ) { }
 
 
     async getAllApps(_id: string): Promise<Application[]> {
@@ -27,23 +27,23 @@ export class ApplicationService {
                     _id: _id
                 }
             }
-          /*   select: {
-                author: _id
-            }, */
-           /*  where: {
-                 author: _id
-            }, */
-           
+            /*   select: {
+                  author: _id
+              }, */
+            /*  where: {
+                  author: _id
+             }, */
+
         });
         return allApps;
     }
 
     async getAppById(_id: string): Promise<Application> {
         const findThisApp = await this.appRepo.findOne({
-             where: {
-            //  _id,
-             
-            }, 
+            where: {
+                //  _id,
+
+            },
             // relations: ['author']
         });
 
@@ -55,7 +55,7 @@ export class ApplicationService {
     }
 
     async createApplication(appDetails: ApplicationDto, owner: User): Promise<Application> {
-        const {appName, description} = appDetails
+        const { appName, description } = appDetails
         const app = this.appRepo.create({
             appName,
             description,
@@ -76,7 +76,7 @@ export class ApplicationService {
 
     async updateAppStatus(_id: string, status: AppStatus): Promise<Application> {
         const app = await this.appRepo.findOne({
-            where: {_id: _id},
+            where: { _id: _id },
             relations: ['']
         });
         app.status = status;

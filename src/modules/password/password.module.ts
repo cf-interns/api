@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { PasswordController } from './password.controller';
-import { PasswordService } from './password.service';
+import { PasswordController } from '../../controllers/password.controller';
+import { PasswordService } from '../../serviceImpl/password.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Password } from './password.entity';
+import { Password } from '../../domains/password.entity';
 import { EmailModule } from '../email/email/email.module';
 import { UserModule } from '../user/user.module';
 

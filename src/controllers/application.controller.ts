@@ -1,9 +1,9 @@
-import { Controller, Post, Body,Req, Patch, Param, Delete, Get, UseGuards, HttpCode } from '@nestjs/common';
-import { ApplicationService } from './application.service';
-import { Application } from './application.entity';
+import { Controller, Post, Body, Req, Patch, Param, Delete, Get, UseGuards, HttpCode } from '@nestjs/common';
+import { ApplicationService } from '../serviceImpl/application.service';
+import { Application } from '../domains/application.entity';
 import { ApplicationDto } from 'src/dtos/createApplication.dto';
 import { UpdateAppStatus } from 'src/dtos/updateAppStatus.dto';
-import RequestObjectWithUser from '../auth/requestWithUser.interface';
+import RequestObjectWithUser from '../services/requestWithUser.interface';
 import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 import { LocalAuthGuard } from 'src/guards/localAuth.guard';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -13,12 +13,12 @@ export class ApplicationController {
 
     constructor(
         private readonly appService: ApplicationService
-    ) {}
+    ) { }
 
 
-    @ApiOperation({summary: 'Get all created applications', description: 'List of all the apps created by a specific user(creator). This route is protected only authenticated users can access it'})
+    @ApiOperation({ summary: 'Get all created applications', description: 'List of all the apps created by a specific user(creator). This route is protected only authenticated users can access it' })
     @ApiResponse({
-         type: ApplicationDto,
+        type: ApplicationDto,
         status: 200,
         description: 'Successfully sent App List'
     })
@@ -27,19 +27,19 @@ export class ApplicationController {
     @UseGuards(JwtAuthGuard)
     async getAllApps(@Req() req: RequestObjectWithUser): Promise<Application[]> {
         console.log(req.user?._id, 'User Apps');
-        
+
         return this.appService.getAllApps(req.user._id);
     }
 
 
-    @ApiOperation({summary: 'Get specific app'})
+    @ApiOperation({ summary: 'Get specific app' })
     @Get(':id')
     async getAppById(@Param('id') id: string): Promise<Application> {
-          return this.appService.getAppById(id);
+        return this.appService.getAppById(id);
     }
-    
-    
-    @ApiOperation({summary: 'Register a new App', description: 'This route is protected, only authenticated users can create an application'})
+
+
+    @ApiOperation({ summary: 'Register a new App', description: 'This route is protected, only authenticated users can create an application' })
     @ApiResponse({
         type: ApplicationDto,
         status: 201,
@@ -52,19 +52,19 @@ export class ApplicationController {
     }
 
 
-    @ApiOperation({summary: 'Update an app status', description: 'Updata an app status. This route is also protected, so a user must be authenticated to make changes to an application'})
-    
+    @ApiOperation({ summary: 'Update an app status', description: 'Updata an app status. This route is also protected, so a user must be authenticated to make changes to an application' })
+
     @Patch(':id/status')
     @UseGuards(JwtAuthGuard)
     updataAppStatus(
         @Param('id') id: string,
         @Body() updateAppStatusDto: UpdateAppStatus,
     ): Promise<Application> {
-        const {status} = updateAppStatusDto;
+        const { status } = updateAppStatusDto;
         return this.appService.updateAppStatus(id, status);
     }
 
-    @ApiOperation({summary: 'Delete an application', description: 'An authenticated user can delete an application by making a request to this endpoint.'})
+    @ApiOperation({ summary: 'Delete an application', description: 'An authenticated user can delete an application by making a request to this endpoint.' })
     @UseGuards(JwtAuthGuard)
     @Delete(':id')
     deleteApp(@Param('id') id: number): Promise<void> {

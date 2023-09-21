@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Email } from './email.entity';
+import { Email } from '../domains/email.entity';
 import { Repository } from 'typeorm';
 import { MailerService } from '@nestjs-modules/mailer';
-import { EmailDto } from './email.dto';
+import { EmailDto } from '../dtos/email.dto';
 
 @Injectable()
 export class EmailService {
@@ -11,7 +11,7 @@ export class EmailService {
         @InjectRepository(Email)
         private readonly emailRepo: Repository<Email>,
         private readonly mailerService: MailerService
-    ) {}
+    ) { }
 
 
     async sendMail(email: EmailDto, mail: string) {
@@ -33,10 +33,10 @@ export class EmailService {
             });
 
             await this.emailRepo.save(sentEmail);
-            return {message: 'Please check your inbox for further instructions'}
+            return { message: 'Please check your inbox for further instructions' }
         } catch (error) {
             console.log(error);
-            
+
         }
     }
 }

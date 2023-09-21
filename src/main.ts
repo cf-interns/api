@@ -1,6 +1,6 @@
-import { BadRequestException, Logger, ValidationPipe } from "@nestjs/common";
+import { BadRequestException, ClassSerializerInterceptor, Logger, ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { NestFactory } from "@nestjs/core";
+import { NestFactory, Reflector } from "@nestjs/core";
 import * as Sentry from "@sentry/node";
 import { AppModule } from "./app.module";
 import { SentryInterceptor } from "./interceptors/sentry.interceptor";
@@ -21,7 +21,7 @@ async function bootstrap() {
   const port = configService.get<number>("app.port") ?? 3000;
 
 
- // app.useGlobalInterceptors();
+  app.useGlobalInterceptors();
   app.useGlobalPipes(new ValidationPipe(
     {
       whitelist: true,
@@ -37,6 +37,7 @@ async function bootstrap() {
       
     }
   ));
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)))
 
   app.use(cookieParser());
   app.enableCors();

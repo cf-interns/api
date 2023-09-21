@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, Generated, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "../user/user.entity";
+import { User } from "./user.entity";
 
 
 @Entity()
@@ -10,7 +10,7 @@ export class Application {
     @Column()
     public appName: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     public status: string;
 
     @CreateDateColumn()

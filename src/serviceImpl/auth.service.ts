@@ -1,12 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
-import { UserService } from "../user/user.service";
+import { UserService } from "./user.service";
 import * as bcrypt from 'bcrypt'
 import { RegisterDataDto } from "src/dtos/reister.dto";
 import PostgresErrorCode from "src/enums/postgresErrorCode.enum";
-import { User } from "../user/user.entity";
+import { User } from "../domains/user.entity";
 import { JwtService } from "@nestjs/jwt";
 import { ConfigService } from "@nestjs/config";
-import { TokenPayload } from "./tokenPayload.interface";
+import { TokenPayload } from "../services/tokenPayload.interface";
 
 
 @Injectable()
@@ -55,7 +55,7 @@ export class AuthService {
 
     public getCookieWithToken(userId: string) {
         const payload: TokenPayload = { userId };
-        const acess_token:any = this.jwtService.sign(payload, {
+        const acess_token: any = this.jwtService.sign(payload, {
             secret: this.configService.get('JWT_ACCESSS_TOKEN_SECRET'),
             expiresIn: `${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}s`
 
@@ -67,23 +67,28 @@ export class AuthService {
     public getCookieWithRefreshToken(userId: string) {
         const payload: TokenPayload = { userId };
         const refresh_token = this.jwtService.sign(payload, {
-            secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
-            expiresIn: `${this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}s`
+            secret: this.configService.get('jwt.refresh'),
+            expiresIn: `${this.configService.get('jwt.refreshExpTime')}s`
         });
         const cookie = `Refresh=${refresh_token}; HttpOnly; Path=/; Max-Age${this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}`;
-         //TODO: Fiddle with path param to prevent the browser from sending the refresh_token on every req
+        //TODO: Fiddle with path param to prevent the browser from sending the refresh_token on every req
 
-         return {
+
+        console.log(`${this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}s Refresh Exp Time`);
+
+        return {
             cookie,
-             refresh_token
-            }
+            refresh_token
+        }
 
-            
+
+
+
     }
 
 
     public removeCookieForLogOut() {
-        return [`Auth=; HttpOnly; Path=/; Max-Age=0`, 'Refreah=; HttpOnly; Path=/; Max-Age=0'];
+        return [`Auth=; HttpOnly; Path=/; Max-Age=0`, 'Refresh=; HttpOnly; Path=/; Max-Age=0'];
     }
 }
 

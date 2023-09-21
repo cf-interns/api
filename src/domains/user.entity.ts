@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Application } from "../application/application.entity";
+import { Application } from "./application.entity";
+import { Exclude } from "class-transformer";
 
 
 @Entity()
@@ -7,23 +8,20 @@ export class User {
     @PrimaryGeneratedColumn('uuid')
     public _id: string;
 
-    @Column({nullable:  false})
+    @Column({ nullable: false })
     public firstName: string;
 
-    @Column({nullable: false})
+    @Column({ nullable: false })
     public lastName: string;
 
-/*     //TODO: Get FirstName
-    @Column()
-    public userName: string;
- */
-    @Column({nullable: false})
+    @Column({ nullable: false })
+    @Exclude()
     public password: string;
 
-    @Column({unique: true})
+    @Column({ unique: true })
     public email: string;
 
-    @Column({nullable: true})
+    @Column({ nullable: true })
     public currentHashedRefreshToken: string;
 
     @OneToMany(() => Application, (app: Application) => app.author)
