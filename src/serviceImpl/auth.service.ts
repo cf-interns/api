@@ -23,6 +23,7 @@ export class AuthService {
             await this.userService.createUser({
                 ...registerData,
                 password: hashPassword
+                
             });
             console.log('User Created!');
 
@@ -70,7 +71,7 @@ export class AuthService {
             secret: this.configService.get('jwt.refresh'),
             expiresIn: `${this.configService.get('jwt.refreshExpTime')}s`
         });
-        const cookie = `Refresh=${refresh_token}; HttpOnly; Path=/; Max-Age${this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}`;
+        const cookie = `Refresh=${refresh_token};  HttpOnly; Path=/; Max-Age${this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}`;
         //TODO: Fiddle with path param to prevent the browser from sending the refresh_token on every req
 
 

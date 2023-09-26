@@ -93,3 +93,9 @@ export class ApplicationService {
         }
     }
 }
+
+
+
+/* 
+
+http://192.168.100.155/commonfactor/global-notification/api.git*/

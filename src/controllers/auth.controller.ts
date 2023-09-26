@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Get, Post, Req, Res, UseGuards } from "@nestjs/common";
+import { Body, Controller, HttpCode, Get, Post, Req, Res, UseGuards, Request } from "@nestjs/common";
 import { AuthService } from "../serviceImpl/auth.service";
 import { RegisterDataDto } from "src/dtos/reister.dto";
 import RequestObjectWithUser from "../services/requestWithUser.interface";
@@ -42,8 +42,8 @@ export class AuthController {
         description: 'Store User Data'
     })
     @Post('sign_up')
-    async register(@Body() signUpUser: RegisterDataDto) {
-        // console.log(signUpUser, "===> User");
+    async register(@Body() signUpUser: RegisterDataDto, @Req() req: RequestObjectWithUser) {
+         console.log(req.cookies, "===> Token");
         
 
         return this.authService.register(signUpUser);
@@ -71,6 +71,9 @@ export class AuthController {
         await this.userService.setCurrentRefreshToken(refresh_token, user._id);
 
         req.res.setHeader('Set-Cookie', [acessTokenCookie, refreshTokenCookie]);
+        // req.res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173/sign-in');
+
+        console.log('Token =====>>', acessTokenCookie);
         
         return user;
     };

@@ -14,6 +14,11 @@ import { ApplicationModule } from "./modules/application/application.module";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  const corsOptions = {
+    origin: 'http://localhost:5173',
+    methods: ['POST', 'GET'],
+    credentials: true
+  }
 
 
   const configService = app.get(ConfigService);
@@ -26,7 +31,7 @@ async function bootstrap() {
     {
       whitelist: true,
       transform: true,
-      exceptionFactory:(errors)=> {
+      exceptionFactory: (errors) => {
         const result = errors.map((error) => ({
           property: error.property,
           message: error.constraints[Object.keys(error.constraints)[0]],
@@ -34,13 +39,13 @@ async function bootstrap() {
         return new BadRequestException(result);
       },
       stopAtFirstError: true
-      
+
     }
   ));
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)))
 
   app.use(cookieParser());
-  app.enableCors();
+  app.enableCors(corsOptions);
   app.setGlobalPrefix(configService.get<string>("app.prefix") ?? "api");
 
 
@@ -50,15 +55,15 @@ async function bootstrap() {
     app.useGlobalInterceptors(new SentryInterceptor());
   }
   const config = new DocumentBuilder()
-  .setTitle('GNS')
-  .setDescription('### GNS API Overview')
-  .setVersion('1.0')
-  .addTag('docs')
-  .build();
-const document = SwaggerModule.createDocument(app, config, {
-  include: [UserModule, AuthModule, PasswordModule, ApplicationModule]
-});
-SwaggerModule.setup('api', app, document);
+    .setTitle('GNS')
+    .setDescription('### GNS API Overview')
+    .setVersion('1.0')
+    .addTag('docs')
+    .build();
+  const document = SwaggerModule.createDocument(app, config, {
+    include: [UserModule, AuthModule, PasswordModule, ApplicationModule]
+  });
+  SwaggerModule.setup('api', app, document);
   await app.listen(port);
 
   logger.log(`Application listening at port ${port}`);
