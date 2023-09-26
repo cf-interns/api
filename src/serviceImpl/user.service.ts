@@ -39,13 +39,13 @@ export class UserService {
         return allUsers;
     }
 
-    async createUser(userData: CreateUserDto): Promise<User> {
+    async createUser(userData: CreateUserDto): Promise<void> {
         console.log(userData);
 
         const user = this.userRepo.create(userData);
         // console.log("userData ======>>",user);
 
-        user.token = ''
+        //user.token = ''
         await this.userRepo.save(user);
 
         if (!user) {
@@ -53,7 +53,7 @@ export class UserService {
 
         }
 
-        return user
+       
 
     }
 

@@ -43,7 +43,7 @@ export class AuthController {
     })
     @Post('sign_up')
     async register(@Body() signUpUser: RegisterDataDto, @Req() req: RequestObjectWithUser) {
-         console.log(req.cookies, "===> Token");
+       //  console.log(req.cookies, "===> Token");
         
 
         return this.authService.register(signUpUser);
@@ -73,7 +73,7 @@ export class AuthController {
         req.res.setHeader('Set-Cookie', [acessTokenCookie, refreshTokenCookie]);
         // req.res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173/sign-in');
 
-        console.log('Token =====>>', acessTokenCookie);
+       //console.log('Token =====>>', acessTokenCookie);
         
         return user;
     };

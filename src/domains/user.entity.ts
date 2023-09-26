@@ -20,9 +20,10 @@ export class User {
 
     @Column({ unique: true })
     public email: string;
-
+    
+/* 
     @Column({nullable: true})
-    public token: string;
+    public token: string; */
 
     @Column({ nullable: true })
     public currentHashedRefreshToken: string;
