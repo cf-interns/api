@@ -33,7 +33,7 @@ export class PasswordService {
 
     await this.passwordRepo.save(pass);
     const token = pass.token
-    const url = `http://localhost:5000/reset/${token}`;
+    const url = `http://localhost:5173/reset-password/${token}`;
     // const mailTo = mail.email
 
     await this.emailService.sendMail({

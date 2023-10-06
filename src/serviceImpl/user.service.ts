@@ -1,10 +1,11 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "../domains/user.entity";
 import { Repository } from "typeorm";
 import { CreateUserDto } from "src/dtos/createUser.dto";
 import * as bcrypt from 'bcrypt';
 import { updateUserPassword } from "../dtos/updataUserData.dto";
+import { ChangePasswordDto } from "src/dtos/changePassword.dto";
 
 
 @Injectable()
@@ -106,5 +107,27 @@ export class UserService {
         return this.userRepo.update(_id, {
             currentHashedRefreshToken: null
         })
+    }
+
+    async changePassword(pass: ChangePasswordDto) {
+
+        const {newPassword, oldPassword} = pass
+
+        //Verify Current Password
+        const current =  await this.userRepo.findOne({
+            where: {
+                password: oldPassword
+            }
+        });
+
+        if(current) {
+            await this.updateUserData(current._id, {password: newPassword});
+
+            return {message: 'Password Succefully Changed'}
+        }
+
+        throw new BadRequestException('Incorrect Password. Please enter current password')
+
+
     }
 }
