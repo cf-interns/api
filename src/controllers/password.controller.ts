@@ -28,10 +28,10 @@ export class PasswordController {
     @HttpCode(200)
     @Post('forgot-password')
     forgotPassword(@Body() email: ForgotPasswordDto) {
-        console.log(email.email);
+        console.log(email.to);
 
 
-        return this.passwordService.createPassword(email.email)
+        return this.passwordService.createPassword(email.to)
     }
 
 
@@ -46,13 +46,4 @@ export class PasswordController {
 
 
 
-    @UseGuards(JwtAuthGuard)
-    @ApiOperation({ summary: 'Password reset', description: 'A user can request a password reset using this route' })
-    @ApiBody({ type: ChangePasswordDto, description: 'User should enter current password to change password.' })
-    @ApiResponse({ description: 'In order to change the user must be authenticated since this endpoint is protected' })
-    @Post('change-password')
-    changePassword(changePasswordDto: ChangePasswordDto) {
-
-        return this.userService.changePassword(changePasswordDto);
-    }
 }

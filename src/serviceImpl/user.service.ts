@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { User } from "../domains/user.entity";
 import { Repository } from "typeorm";
@@ -6,17 +6,31 @@ import { CreateUserDto } from "src/dtos/createUser.dto";
 import * as bcrypt from 'bcrypt';
 import { updateUserPassword } from "../dtos/updataUserData.dto";
 import { ChangePasswordDto } from "src/dtos/changePassword.dto";
+import { MailerService } from "@nestjs-modules/mailer";
+import { Password } from "src/domains/password.entity";
+import { ResetPasswordDto } from "src/dtos/restPassword.dto";
+import { AuthService } from "./auth.service";
+import { EmailService } from "./email.service";
+import { EmailDto } from "src/dtos/email.dto";
 
 
 @Injectable()
 export class UserService {
     constructor(
         @InjectRepository(User)
-        private userRepo: Repository<User>
+        private userRepo: Repository<User>,
+        @InjectRepository(Password)
+        private passwordRepo: Repository<Password>,
+        private readonly emailService: EmailService,
 
     ) { }
 
-
+    public async verifyThisUsersPassword(password: string, passwordInDb: string) {
+        const bcryptVerify = await bcrypt.compare(password, passwordInDb);
+        if (!bcryptVerify) {
+            throw new HttpException('Invalid login', HttpStatus.BAD_REQUEST);
+        }
+    }
 
     async getById(_id: string): Promise<User> {
         const user = await this.userRepo.findOne({
@@ -109,25 +123,83 @@ export class UserService {
         })
     }
 
-    async changePassword(pass: ChangePasswordDto) {
 
-        const {newPassword, oldPassword} = pass
+    async changePassword(_id: string, pass: ChangePasswordDto) {
 
-        //Verify Current Password
-        const current =  await this.userRepo.findOne({
-            where: {
-                password: oldPassword
-            }
-        });
+        try {
+            const getUser = await this.getById(_id);
+            await this.verifyThisUsersPassword(pass.oldPassword, getUser.password);
 
-        if(current) {
-            await this.updateUserData(current._id, {password: newPassword});
-
+            if (getUser) {
+                const hashPassword = await bcrypt.hash(pass.newPassword, 10);
+                await this.updateUserData(getUser._id, {password: hashPassword});
             return {message: 'Password Succefully Changed'}
+
+            }
+        } catch (error) {
+            console.log(error);
+
+            throw new BadRequestException('Icorrect Password. Please enter the current password')
+            
         }
 
-        throw new BadRequestException('Incorrect Password. Please enter current password')
-
-
     }
+
+    
+    async findPassword(token: string) {
+        return this.passwordRepo.findOne({
+            where: {
+                token
+            }
+        })
+    }
+
+    async createPassword(mail: EmailDto) {
+        const pass = this.passwordRepo.create({
+            mail: mail.to
+        });
+
+        await this.passwordRepo.save(pass);
+        const token = pass.token
+        const url = `http://loacalhost:5173/reset-password/${token}`;
+
+        await this.emailService.sendMail({
+            to: mail.to,
+            subject: mail.subject,
+            from: mail.from,
+            html: `Click <a href='${url}'>here</a> to reset your password`
+        });
+
+        return {message: 'Please check your email for further instructions'}
+    }
+
+    async resetPassword(pass: ResetPasswordDto) {
+        const {password, confirmPassword, token} = pass;
+
+        if (password!== confirmPassword) {
+            throw new BadRequestException('Passwords do not match!')
+        };
+
+        const resetPass = await this.findPassword(token);
+
+        const user = await this.getByEmail(resetPass.mail);
+
+        if (!user) {
+            throw new NotFoundException('Email successfully Sent! ')
+        };
+
+        const hashPassword = await bcrypt.hash(password, 10);
+
+        await this.updateUserData(user._id, {password: hashPassword});
+
+        await this.emailService.sendMail({
+            to: resetPass.mail,
+            from: 'no-reply@payunit.net',
+            subject: 'Password Changed!',
+            html: `This Email is to infrom you that your password has been changed! If you did not initiate this change sorry someone changed your password and we can't do $hit. JK lol! Please contact us <a href="http://localhost:5000/">@help-deskgns<a/>`
+        });
+
+        return {message: 'Password Successfully Changed!'}
+    }
+
 }

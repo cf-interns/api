@@ -14,12 +14,13 @@ export class EmailService {
     ) { }
 
 
-    async sendMail(email: EmailDto, mail: string) {
+    async sendMail(email: EmailDto, ) {
         let data = {
-            to: mail,
-            from: 'no-reply@payunit.net',
-            subject: 'Test Password Reset Token',
-            text: email.text
+            to: email.to,
+            from: email.from,
+            subject: email.subject,
+            text: email.text,
+            
         }
 
 

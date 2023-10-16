@@ -10,7 +10,7 @@ export class EmailController {
     ) { }
 
     @Post()
-    sendEmail(@Body() emailDto: EmailDto, mailTo: string) {
-        this.emailService.sendMail(emailDto, mailTo);
+    sendEmail(@Body() emailDto: EmailDto,) {
+        this.emailService.sendMail(emailDto);
     }
 }

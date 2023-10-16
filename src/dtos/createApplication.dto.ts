@@ -6,7 +6,7 @@ export class ApplicationDto {
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
-    @MinLength(10)
+    @MinLength(5)
     appName: string;
 
     @ApiProperty()

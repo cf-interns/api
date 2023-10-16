@@ -13,6 +13,8 @@ import { AuthModule } from "./modules/auth/auth.module";
 import * as Joi from "joi";
 import { ApplicationModule } from "./modules/application/application.module";
 import { PasswordModule } from "./modules/password/password.module";
+import { EmailModule } from "./modules/email/email.module";
+import SmsModule from "./modules/sms/sms.module";
 
 const ENV = process.env.NODE_ENV;
 console.log(ENV, '<====== ENV', process.cwd());
@@ -36,8 +38,8 @@ console.log(ENV, '<====== ENV', process.cwd());
     UserModule,
     AuthModule,
     ApplicationModule,
-    PasswordModule
-   
+    EmailModule,
+    SmsModule,
   ],
   controllers: [],
   providers: [

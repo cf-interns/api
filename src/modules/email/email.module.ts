@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { EmailController } from '../../../controllers/email.controller';
-import { EmailService } from '../../../serviceImpl/email.service';
+import { EmailController } from '../../controllers/email.controller';
+import { EmailService } from '../../serviceImpl/email.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Email } from '../../../domains/email.entity';
+import { Email } from '../../domains/email.entity';
 
 @Module({
   imports: [MailerModule.forRoot({

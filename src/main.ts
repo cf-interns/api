@@ -10,6 +10,8 @@ import { UserModule } from "./modules/user/user.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { PasswordModule } from "./modules/password/password.module";
 import { ApplicationModule } from "./modules/application/application.module";
+import SmsModule from "./modules/sms/sms.module";
+import { EmailModule } from "./modules/email/email.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -61,7 +63,7 @@ async function bootstrap() {
     .addTag('docs')
     .build();
   const document = SwaggerModule.createDocument(app, config, {
-    include: [UserModule, AuthModule, PasswordModule, ApplicationModule]
+    include: [UserModule, AuthModule, PasswordModule, ApplicationModule, SmsModule, EmailModule]
   });
   SwaggerModule.setup('api', app, document);
   await app.listen(port);
