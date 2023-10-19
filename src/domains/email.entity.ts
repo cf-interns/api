@@ -1,11 +1,12 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Application } from "./application.entity";
 
 
 @Entity({name: 'email'})
 export class Email {
 
-    @PrimaryGeneratedColumn()
-    id: number
+    @PrimaryGeneratedColumn('uuid')
+    id: string
 
     @Column()
     to: string
@@ -18,4 +19,10 @@ export class Email {
 
     @Column()
     subject: string
+
+    @CreateDateColumn()
+    sent_at: string
+
+    @ManyToOne(() => Application, (author: Application) => author.email)
+    author?: Application
 }

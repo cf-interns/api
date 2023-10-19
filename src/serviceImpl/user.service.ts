@@ -6,12 +6,10 @@ import { CreateUserDto } from "src/dtos/createUser.dto";
 import * as bcrypt from 'bcrypt';
 import { updateUserPassword } from "../dtos/updataUserData.dto";
 import { ChangePasswordDto } from "src/dtos/changePassword.dto";
-import { MailerService } from "@nestjs-modules/mailer";
 import { Password } from "src/domains/password.entity";
 import { ResetPasswordDto } from "src/dtos/restPassword.dto";
-import { AuthService } from "./auth.service";
 import { EmailService } from "./email.service";
-import { EmailDto } from "src/dtos/email.dto";
+import  EmailDto  from "src/dtos/email.dto";
 
 
 @Injectable()
@@ -58,9 +56,7 @@ export class UserService {
         console.log(userData);
 
         const user = this.userRepo.create(userData);
-        // console.log("userData ======>>",user);
-
-        //user.token = ''
+       
         await this.userRepo.save(user);
 
         if (!user) {

@@ -4,6 +4,8 @@ import { EmailService } from '../../serviceImpl/email.service';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Email } from '../../domains/email.entity';
+import { ApplicationModule } from '../application/application.module';
+import { Application } from 'src/domains/application.entity';
 
 @Module({
   imports: [MailerModule.forRoot({
@@ -23,7 +25,7 @@ import { Email } from '../../domains/email.entity';
     defaults: {
       from: 'no-reply@payunit.net'
     }
-  }), TypeOrmModule.forFeature([Email])],
+  }), TypeOrmModule.forFeature([Email, Application]), ],
   controllers: [EmailController],
   providers: [EmailService],
   exports: [EmailService]

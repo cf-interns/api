@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Application } from "./application.entity";
 
 
 @Entity({name: 'sms'})
@@ -26,18 +27,21 @@ export class Sms {
     messageid: string;
 
     @Column()
-    errorcode: number;
+    errorcode: string;
 
     @Column()
     errordescription: string;
 
-    @Column()
+    @CreateDateColumn()
     createdAt: string;
 
     @Column()
-    totalSmsUnit: number;
+    totalSmsUnit: string;
 
     @Column()
-    balance: number
+    balance: string;
+    
+    @ManyToOne(() => Application, (author: Application) => author.sms)
+    author?: Application
 
 }
