@@ -11,5 +11,6 @@ import { SmsService } from "src/serviceImpl/sms.service";
     imports: [TypeOrmModule.forFeature([Sms, Application]), HttpModule],
     controllers: [SmsController],
     providers: [SmsService],
+    exports: [SmsService]
 })
 export default class SmsModule {}

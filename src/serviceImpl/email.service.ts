@@ -117,9 +117,4 @@ export class EmailService {
         return {messagr: 'Email Deleted!'}
     }
 
-    @Cron('45 * * * * *')
-    async TestJob () {
-        console.log('Cron Running!');
-        
-    }
 }

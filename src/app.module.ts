@@ -15,7 +15,8 @@ import { ApplicationModule } from "./modules/application/application.module";
 import { EmailModule } from "./modules/email/email.module";
 import SmsModule from "./modules/sms/sms.module";
 import PushNotificationsModule from "./modules/pushNotifications/pushnotification.module";
-import { ScheduleModule } from "@nestjs/schedule";
+import {MessageModule} from "./modules/messages/messages.module";
+
 
 const ENV = process.env.NODE_ENV;
 console.log(ENV, '<====== ENV', process.cwd());
@@ -41,8 +42,8 @@ console.log(ENV, '<====== ENV', process.cwd());
     ApplicationModule,
     EmailModule,
     SmsModule,
-    PushNotificationsModule, 
-    ScheduleModule.forRoot()
+    PushNotificationsModule,
+    MessageModule,
   ],
   controllers: [],
   providers: [

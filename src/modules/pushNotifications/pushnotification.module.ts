@@ -15,6 +15,7 @@ import PushNotificationsService from "src/serviceImpl/pushNotification.service";
     }) */ TypeOrmModule.forFeature([Push, Application])],
     controllers: [PushNotificationsController],
     providers: [PushNotificationsService],
+    exports: [PushNotificationsService]
 })
 
 export default class PushNotificationsModule {}
