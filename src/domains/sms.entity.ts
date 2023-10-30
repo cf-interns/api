@@ -26,10 +26,10 @@ export class Sms {
     @Column({nullable: true})
     messageid: string;
 
-    @Column()
+    @Column({nullable: true})
     errorcode: string;
 
-    @Column()
+    @Column({nullable: true})
     errordescription: string;
 
     @CreateDateColumn()

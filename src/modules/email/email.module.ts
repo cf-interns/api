@@ -25,7 +25,7 @@ import { Application } from 'src/domains/application.entity';
     defaults: {
       from: 'no-reply@payunit.net'
     }
-  }), TypeOrmModule.forFeature([Email, Application]), ],
+  }), TypeOrmModule.forFeature([Email, Application]), ApplicationModule],
   controllers: [EmailController],
   providers: [EmailService],
   exports: [EmailService]

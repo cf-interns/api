@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger } from "@nestjs/common";
 import { UserService } from "./user.service";
 import * as bcrypt from 'bcrypt'
 import { RegisterDataDto } from "src/dtos/reister.dto";
@@ -11,6 +11,7 @@ import { TokenPayload } from "../services/tokenPayload.interface";
 
 @Injectable()
 export class AuthService {
+    private logger = new Logger('AuthService')
     constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
@@ -25,12 +26,14 @@ export class AuthService {
                 password: hashPassword
                 
             });
-            console.log('User Created!');
+            this.logger.log(`Registering user ${JSON.stringify(registerData)}`)
+            // console.log('User Created!');
 
         } catch (error) {
             if (error?.code === PostgresErrorCode.UniqueViolation) {
                 throw new HttpException('User already exists', HttpStatus.BAD_REQUEST);
             }
+            this.logger.log('An error occured while registering a new user', error.stack)
         }
 
         return { mesaage: 'User Created!' }
@@ -42,6 +45,7 @@ export class AuthService {
             await this.verifyThisUsersPassword(password, getUser.password);
             return getUser
         } catch (error) {
+            this.logger.log(`An error occured while login in a user`, error.stack)
             throw new HttpException('Invalid login', HttpStatus.BAD_REQUEST);
         }
     }
@@ -55,6 +59,8 @@ export class AuthService {
 
 
     public getCookieWithToken(userId: string) {
+        try {
+            
         const payload: TokenPayload = { userId };
         const acess_token: any = this.jwtService.sign(payload, {
             secret: this.configService.get('JWT_ACCESSS_TOKEN_SECRET'),
@@ -62,11 +68,16 @@ export class AuthService {
 
         });
         return `Auth = ${acess_token}; HttpOnly; Path=/; Max-Age${this.configService.get('JWT_ACCESS_TOKEN_EXPIRATION_TIME')}`;
+        } catch (error) {
+            this.logger.log(`An error occured while getting cookie`, error.stack);
+            throw new InternalServerErrorException('Internal Error')
+        }
     }
 
 
     public getCookieWithRefreshToken(userId: string) {
-        const payload: TokenPayload = { userId };
+        try {
+            const payload: TokenPayload = { userId };
         const refresh_token = this.jwtService.sign(payload, {
             secret: this.configService.get('jwt.refresh'),
             expiresIn: `${this.configService.get('jwt.refreshExpTime')}s`
@@ -75,12 +86,16 @@ export class AuthService {
         //TODO: Fiddle with path param to prevent the browser from sending the refresh_token on every req
 
 
-        console.log(`${this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME')}s Refresh Exp Time`);
 
         return {
             cookie,
             refresh_token
         }
+        } catch (error) {
+            this.logger.log(`An error occured while getting refreshToken`);
+            throw new InternalServerErrorException('Internal Error')
+        }
+        
 
 
 
@@ -94,7 +109,3 @@ export class AuthService {
 }
 
 
-//C => Create User
-//RUD 
-
-// Create an app for a user(_id, name, token)  ==> User?

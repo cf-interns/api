@@ -1,20 +1,23 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Email } from '../domains/email.entity';
 import { Repository } from 'typeorm';
 import { MailerService } from '@nestjs-modules/mailer';
 import  EmailDto  from '../dtos/email.dto';
 import { Application } from 'src/domains/application.entity';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { ApplicationService } from './application.service';
+// import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class EmailService {
+    private logger = new Logger('EmailService', {timestamp: true})
     constructor(
         @InjectRepository(Email)
         private readonly emailRepo: Repository<Email>,
         private readonly mailerService: MailerService,
         @InjectRepository(Application)
-        private readonly applicationRepo: Repository<Application>
+        private readonly applicationRepo: Repository<Application>,
+        private appService: ApplicationService
     ) { }
 
 
@@ -41,7 +44,7 @@ export class EmailService {
         if(!findThisMail) {
             throw new NotFoundException('Email Does Not Exist')
         };
-
+        this.logger.log(`Email with id ${emailId} found. Email: ${findThisMail}`)
         return findThisMail;
     }
 
@@ -67,16 +70,18 @@ export class EmailService {
             await this.emailRepo.save(sentEmail);
             return { message: 'Please check your inbox for further instructions' }
         } catch (error) {
-            console.log(error);
-
+            this.logger.log('An error occured while trying to send an email', error.stack)
+            throw new InternalServerErrorException('Internal Server Error')
         }
     }
 
     async sendApplicationMail(email: EmailDto, appId: string,) {
-        const app = await this.applicationRepo.findOne({where: {token: appId}})
-            if (!app) {
-                throw new HttpException('Application Not Found', HttpStatus.NOT_FOUND)
-            }
+        const app = await this.appService.getAppByToken(appId)
+         
+        if(app.status === 'INACTIVE') {
+
+            throw new HttpException('Please Activate Your Application', HttpStatus.UNAUTHORIZED)
+        };
             let data = {
                 to: email.to,
                 from: email.from,
@@ -87,6 +92,8 @@ export class EmailService {
     
     
             try {
+            
+              
                 let res = await this.mailerService.sendMail(data);
                 let sentEmail = this.emailRepo.create({
                     to: res.envelope?.to,
@@ -97,11 +104,14 @@ export class EmailService {
                 });
     
                 await this.emailRepo.save(sentEmail);
-                console.log(sentEmail, 'Email++++++');
+                // console.log(sentEmail, 'Email++++++');
                 
                 return { message: 'Email Success fully Sent!' }
             } catch (error) {
-                console.log(error);
+
+                this.logger.log('An Error Occured while trying to send an email', error.stack)
+                throw new InternalServerErrorException(`An Error occured`,)
+                // console.log(error);
     
             }
 
@@ -113,7 +123,7 @@ export class EmailService {
         if (deleteThisEmail.affected === 0) {
             throw new NotFoundException('Email Not Found')
         }
-
+        this.logger.log(`Email Deleted!`)
         return {messagr: 'Email Deleted!'}
     }
 

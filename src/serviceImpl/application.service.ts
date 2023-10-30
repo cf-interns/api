@@ -41,7 +41,7 @@ export class ApplicationService {
     async getAppById(_id: string): Promise<Application> {
         const findThisApp = await this.appRepo.findOne({
             where: {
-                //  _id,
+                _id,
 
             },
             // relations: ['author']
@@ -53,6 +53,18 @@ export class ApplicationService {
 
         return findThisApp;
     }
+
+    async getAppByToken(token: string): Promise<Application> {
+        const findApp = await this.appRepo.findOne({
+            where: {token}
+        });
+        if (!findApp) {
+            throw new NotFoundException('App Not Found!');
+            
+        }
+
+        return findApp
+    } 
 
     async createApplication(appDetails: ApplicationDto, owner: User): Promise<Application> {
         const { appName, description } = appDetails
@@ -77,7 +89,7 @@ export class ApplicationService {
     async updateAppStatus(_id: string, status: AppStatus): Promise<Application> {
         const app = await this.appRepo.findOne({
             where: { _id: _id },
-            relations: ['']
+            // relations: ['applications']
         });
         app.status = status;
         await this.appRepo.save(app);
@@ -92,6 +104,8 @@ export class ApplicationService {
             throw new NotFoundException('Application Not Found!');
         }
     }
+
+    
 }
 
 

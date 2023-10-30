@@ -10,7 +10,7 @@ export class PushNotificationDto {
     notification: {
         body: string,
         title: string,
-        icon: string | null
+        // icon: string | null
     }
 
     @ApiProperty()

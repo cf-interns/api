@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Get, Post, Req, Res, UseGuards, Request } from "@nestjs/common";
+import { Body, Controller, HttpCode, Get, Post, Req, Res, UseGuards, Request, Logger } from "@nestjs/common";
 import { AuthService } from "../serviceImpl/auth.service";
 import { RegisterDataDto } from "src/dtos/reister.dto";
 import RequestObjectWithUser from "../services/requestWithUser.interface";
@@ -13,6 +13,7 @@ import { JwtAuthGuard } from "src/guards/jwt-auth.guard";
 
 @Controller('auth')
 export class AuthController {
+    private logger = new Logger()
     constructor(
         private readonly authService: AuthService,
         private readonly userService: UserService

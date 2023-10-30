@@ -36,6 +36,16 @@ export default () => ({
     expTime: process.env.JWT_EXPIRATION_TIME,
     refresh: process.env.JWT_REFRESH_TOKEN_SECRET,
     refreshExpTime: process.env.JWT_REFRESH_TOKEN_EXPIRATION_TIME
+  },
+  http: {
+    timeout: process.env.HTTP_TIMEOUT,
+    redirects: process.env.HTTP_MAX_REDIRECTS
+  },
+  nexah: {
+    user: process.env.NEXAH_SMS_API_USER,
+    password: process.env.NEXAH_SMS_API_PASSWORD,
+    senderId: process.env.NEXAH_SMS_API_SENDERID,
+    url: process.env.NEXAH_SMS_API_URL
   }
   
 });

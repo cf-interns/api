@@ -31,7 +31,7 @@ initializeApp({
 
 
   const configService = app.get(ConfigService);
-  const logger = new Logger("NestApplication");
+  const logger = new Logger("GNS APP");
   const port = configService.get<number>("app.port") ?? 3000;
 
 

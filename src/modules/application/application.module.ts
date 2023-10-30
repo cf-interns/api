@@ -8,6 +8,7 @@ import { Sms } from 'src/domains/sms.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Sms, Application])],
   controllers: [ApplicationController],
-  providers: [ApplicationService]
+  providers: [ApplicationService],
+  exports: [ApplicationService]
 })
 export class ApplicationModule { }

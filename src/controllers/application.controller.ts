@@ -60,7 +60,10 @@ export class ApplicationController {
         @Param('id') id: string,
         @Body() updateAppStatusDto: UpdateAppStatus,
     ): Promise<Application> {
+        
         const { status } = updateAppStatusDto;
+        console.log(id, 'IDDD', status, 'STATUS');
+
         return this.appService.updateAppStatus(id, status);
     }
 

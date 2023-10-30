@@ -7,9 +7,10 @@ import { MessageService } from "src/serviceImpl/message.service";
 import SmsModule from "../sms/sms.module";
 import { EmailModule } from "../email/email.module";
 import PushNotificationsModule from "../pushNotifications/pushnotification.module";
+import { ApplicationModule } from "../application/application.module";
 
 @Module({
-    imports: [ScheduleModule.forRoot(), TypeOrmModule.forFeature([Message]), SmsModule, EmailModule, PushNotificationsModule],
+    imports: [ScheduleModule.forRoot(), TypeOrmModule.forFeature([Message]), SmsModule, EmailModule, PushNotificationsModule, ApplicationModule],
     controllers: [MessageController],
     providers: [MessageService]
 })

@@ -33,7 +33,7 @@ export default class PushNotificationsController {
     @HttpCode(200)
     @Post('send-notification/:application_id')
     async sendMessage(@Body() message: PushNotificationDto, @Param('application_id') application_id: string, @GetUser() user: User) {
-        console.log(user);
+        console.log(message, '====>>>Token?');
         
         return this.pushNotificationService.sendMessage(message, application_id)
     }

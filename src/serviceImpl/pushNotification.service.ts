@@ -1,5 +1,5 @@
 import { FcmService } from "@doracoder/fcm-nestjs";
-import { HttpException, HttpStatus, Injectable, NotFoundException } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { getMessaging, } from "firebase-admin/messaging";
 import getToken from 'firebase/messaging'
@@ -13,7 +13,7 @@ import { Repository } from "typeorm";
 
 @Injectable()
 export default class PushNotificationsService {
-
+  private logger = new Logger('Push-Notification Service')
   constructor(
     //  readonly fcmService: FcmService
     @InjectRepository(Push)
@@ -54,11 +54,13 @@ export default class PushNotificationsService {
     if (!findThisPush) {
       throw new NotFoundException('Notification Does Not Exist');
     };
+    this.logger.log(`Push with id: ${pushId}, ===> ${findThisPush} `)
     return findThisPush;
   }
 
   async sendMessage(message: PushNotificationDto, applicationId: string) {
-    console.log(applicationId, 'ID+++++');
+    // console.log(applicationId, 'ID+++++');
+    this.logger.log(`Sending push with message: ${JSON.stringify(message)} on application with id ${applicationId}`)
     
     const app = await this.applicationRepository.findOne({ where: { token: applicationId } })
     if (!app) {
@@ -73,18 +75,18 @@ export default class PushNotificationsService {
         const savePush = new Push()
         savePush.title = message.notification.title
         savePush.body = message.notification.body
-        savePush.icon = message.notification.icon
+        // savePush.icon = message.notification.icon
 
         savePush.author = app
         await this.pushRepo.save(savePush)
 
-        console.log("Notification Successfuly Sent", res);
+        this.logger.log(`Notification Successfully Sent ${res}`)
 
         return savePush;
 
       })
       .catch((error) => {
-        console.log(error);
+        this.logger.log(`An error occured while sending push`, error.stack)
 
         throw new HttpException('Something went wrong', HttpStatus.BAD_REQUEST)
 
@@ -99,6 +101,7 @@ export default class PushNotificationsService {
       if (deleteThisPush.affected === 0) {
         throw new NotFoundException('Notification Not Found')
       }
+      this.logger.log(`Deleting push notification with id ${pushId}`);
     return {message: 'Notification Deleted!'}
 
     }
