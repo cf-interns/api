@@ -6,6 +6,7 @@ export default class EmailDto {
     
 
     @ApiProperty()
+    @IsNotEmpty()
     @IsString()
     text?: string
 
@@ -25,6 +26,12 @@ export default class EmailDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    from?: string
+    from?: string;
+
+    @IsString()
+    token?: string;
+
+    @IsString()
+    _id?: string;
 
 }

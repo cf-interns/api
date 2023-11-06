@@ -56,7 +56,8 @@ export class ApplicationService {
 
     async getAppByToken(token: string): Promise<Application> {
         const findApp = await this.appRepo.findOne({
-            where: {token}
+            where: {token},
+            // relations: ['notification']
         });
         if (!findApp) {
             throw new NotFoundException('App Not Found!');

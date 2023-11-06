@@ -46,6 +46,7 @@ export default () => ({
     password: process.env.NEXAH_SMS_API_PASSWORD,
     senderId: process.env.NEXAH_SMS_API_SENDERID,
     url: process.env.NEXAH_SMS_API_URL
-  }
+  },
+  
   
 });

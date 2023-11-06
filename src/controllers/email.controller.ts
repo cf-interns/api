@@ -14,7 +14,7 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { JwtAuthGuard } from "src/guards/jwt-auth.guard";
 
 @ApiTags("emails")
-@Controller("email")
+@Controller("emails")
 export class EmailController {
   constructor(private readonly emailService: EmailService) {}
 

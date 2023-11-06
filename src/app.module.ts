@@ -16,6 +16,8 @@ import { EmailModule } from "./modules/email/email.module";
 import SmsModule from "./modules/sms/sms.module";
 import PushNotificationsModule from "./modules/pushNotifications/pushnotification.module";
 import {MessageModule} from "./modules/messages/messages.module";
+import { NotifcationsModule } from "./modules/notifications/notifications.module";
+
 
 
 const ENV = process.env.NODE_ENV;
@@ -26,24 +28,30 @@ console.log(ENV, '<====== ENV', process.cwd());
     ConfigModule.forRoot({
       load: [envConfig],
       isGlobal: true,
-      envFilePath:  path.resolve(process.cwd(), !ENV ? ".env" : `.env.${ENV}`)  /* '.env.dev' */,
+      envFilePath: path.resolve(
+        process.cwd(),
+        !ENV ? ".env" : `.env.${ENV}`
+      ) /* '.env.dev' */,
       cache: true,
       validationSchema: Joi.object({
         JWT_ACCESSS_TOKEN_SECRET: Joi.string().required(),
         JWT_ACCESS_TOKEN_EXPIRATION_TIME: Joi.string().required(),
         JWT_REFRESH_TOKEN_SECRET: Joi.string().required(),
         JWT_REFRESH_TOKEN_EXPIRATION_TIME: Joi.string().required(),
-      })
+        REDIS_HOST: Joi.string().required(),
+        REDIS_PORT: Joi.number().required()
+      }),
     }),
     TypeOrmModule.forRootAsync(typeormConfig),
     CoreModule,
     UserModule,
     AuthModule,
     ApplicationModule,
-    EmailModule,
-    SmsModule,
-    PushNotificationsModule,
-    MessageModule,
+    // EmailModule,
+    // SmsModule,
+    // PushNotificationsModule,
+    // MessageModule,
+    NotifcationsModule,
   ],
   controllers: [],
   providers: [

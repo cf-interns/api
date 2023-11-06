@@ -15,6 +15,7 @@ pnpm-lock.yaml
 .env.prod
 .env.staging
 .env.debug
+.firebase
 
 # Docker
 
