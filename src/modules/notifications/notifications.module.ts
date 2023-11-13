@@ -11,6 +11,8 @@ import { BullModule } from "@nestjs/bull";
 import { AUTOMATIC_NOTIFICATIONS_QUEUE } from "src/common/constants";
 import { NotificationsProcessor } from "src/processors/notification.processor";
 import { ScheduleModule } from "@nestjs/schedule";
+import { ServeStaticModule } from "@nestjs/serve-static";
+// import { join } from "path";
 
 @Module({
   imports: [
@@ -60,6 +62,10 @@ import { ScheduleModule } from "@nestjs/schedule";
       name: AUTOMATIC_NOTIFICATIONS_QUEUE,
     }),
     ScheduleModule.forRoot(),
+    ServeStaticModule.forRoot({
+      rootPath:
+        "/home/factor/api/dist/client" /*  join(__dirname, "..", "client") */,
+    }),
   ],
   controllers: [NotificationController],
   providers: [NotificationsService, NotificationsProcessor],
