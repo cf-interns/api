@@ -32,6 +32,7 @@ import { Cron, CronExpression } from "@nestjs/schedule";
 import { CronEmailMessage } from "src/dtos/cronEmail.dot";
 import { DateTime } from "luxon";
 import * as moment from "moment";
+import { GetNotificationsFilterDto } from "src/dtos/getNotifications-filter.dto";
 
 @Injectable()
 export class NotificationsService {
@@ -251,16 +252,63 @@ export class NotificationsService {
     return { message: "Push Successfully Sent!" };
   }
 
-  async getAllNotification(appToken: string): Promise<Partial<Notification[]>> {
+  async getAllNotification(appToken: string,) {
     const notifications = await this.notificationsRepo.find({
       where: {
         author: { token: appToken },
       },
       relations: { author: true },
     });
-    console.log("Notifications ====>", notifications);
+    // console.log("Notifications ====>", notifications);
 
     return notifications;
+  }
+
+  async getNotificationsWithFilters(filterDto: GetNotificationsFilterDto, appToken: string): Promise<Notification[]> {
+    const { notification_type, status, search } = filterDto;
+    let notifications = await this.getAllNotification(appToken);
+
+    if (notification_type) {
+      notifications = notifications.filter(
+        (item) => item.notification_type === notification_type
+      );
+    }
+
+    if (status) {
+      notifications = notifications.filter((item) => item.status === status);
+    }
+
+    if (search) {
+      // console.log(search.toUpperCase(), "<<===== search term");
+
+      notifications = notifications.filter((item) => {
+        return item.subject.toLowerCase().includes(search.toLowerCase());
+      });
+    }
+
+    return notifications;
+
+    /* 
+      const query = this.notificationsRepo.createQueryBuilder('notifications');
+
+    if (notification_type) {
+      query.andWhere('notifications.notification_type = :notification_type', {notification_type: `%${notification_type}`});
+    };
+
+    if (search) {
+      query.andWhere('LOWER(notifications.title) LIKE LOWER(:search)', {
+        search: `%${search}%`
+      })
+    };
+
+    if(status) {
+      query.andWhere('LOWER(notifications.status) LIKE LOWER(:status)', {
+        status: `%${status}`
+      })
+    };
+
+    const notifications = await query.getMany();
+    return notifications; */
   }
 
   async getSpecificNotification(notificationId: string): Promise<Notification> {
@@ -337,8 +385,7 @@ export class NotificationsService {
     return { message: "No New Messages to add to the Queue" };
   }
 
-
-  @Cron(CronExpression.EVERY_MINUTE)
+  // @Cron(CronExpression.EVERY_MINUTE)
   async sendAutomaticSms() {
     const date = new Date();
     const sms = await this.notificationsRepo.find({
@@ -351,7 +398,7 @@ export class NotificationsService {
         author: true,
       },
     });
-//testlabhub67#$
+    //testlabhub67#$
     if (sms) {
       sms.map((msg) => {
         return this.automaticNotificationsQueue.add(NOTIFICATIONS_PROCESS_SMS, {
@@ -410,7 +457,7 @@ export class NotificationsService {
         // external_id: extractInfo(smsResult, "messageid"),
         sent_by: getApp.appName,
         timeData: sms.time,
-        status: 'PENDING'
+        status: "PENDING",
       });
 
       return this.notificationsRepo.save(saveMessage);
