@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDateString, IsNotEmpty, IsPhoneNumber, IsString } from "class-validator";
+import { IsDateString, IsNotEmpty, IsOptional, IsPhoneNumber, IsString } from "class-validator";
 
 
 export class smsDto {
@@ -13,6 +13,7 @@ export class smsDto {
   @IsPhoneNumber("CM")
   mobiles: string;
 
+  @IsOptional()
   @IsDateString()
   time?: string;
 

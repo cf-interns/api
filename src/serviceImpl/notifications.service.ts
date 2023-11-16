@@ -252,63 +252,62 @@ export class NotificationsService {
     return { message: "Push Successfully Sent!" };
   }
 
-  async getAllNotification(appToken: string,) {
-    const notifications = await this.notificationsRepo.find({
+  async getAllNotification(appToken: string, offset?: number, limit?: number) {
+    const [notifications, count] = await this.notificationsRepo.findAndCount({
       where: {
         author: { token: appToken },
       },
       relations: { author: true },
+      order: {
+        _id: "ASC",
+      },
+      skip: offset,
+      take: limit,
     });
     // console.log("Notifications ====>", notifications);
 
-    return notifications;
+    return { notifications, count };
   }
 
-  async getNotificationsWithFilters(filterDto: GetNotificationsFilterDto, appToken: string): Promise<Notification[]> {
+  async getNotificationsWithFilters(
+    filterDto: GetNotificationsFilterDto,
+    appToken: string,
+    offset?: number,
+    limit?: number
+  ): Promise<object> {
     const { notification_type, status, search } = filterDto;
-    let notifications = await this.getAllNotification(appToken);
+
+    //Don't entire NotificationsRepo for GNS. Just search for the concerned application
+    const query = this.notificationsRepo
+      .createQueryBuilder("notifications")
+      .orderBy("notifications._id", "ASC")
+      .limit(limit)
+      .offset(offset);
+    // console.log(notification_type, search, status, 'QueryBuilder',);
 
     if (notification_type) {
-      notifications = notifications.filter(
-        (item) => item.notification_type === notification_type
-      );
+      query.andWhere("notifications.notification_type = :notification_type", {
+        notification_type,
+      });
+      // console.log('First Filter', notification_type);
     }
 
     if (status) {
-      notifications = notifications.filter((item) => item.status === status);
-    }
-
-    if (search) {
-      // console.log(search.toUpperCase(), "<<===== search term");
-
-      notifications = notifications.filter((item) => {
-        return item.subject.toLowerCase().includes(search.toLowerCase());
+      query.andWhere("LOWER(notifications.status) LIKE LOWER(:status)", {
+        status,
       });
     }
 
-    return notifications;
-
-    /* 
-      const query = this.notificationsRepo.createQueryBuilder('notifications');
-
-    if (notification_type) {
-      query.andWhere('notifications.notification_type = :notification_type', {notification_type: `%${notification_type}`});
-    };
-
     if (search) {
-      query.andWhere('LOWER(notifications.title) LIKE LOWER(:search)', {
-        search: `%${search}%`
-      })
-    };
+      query.andWhere("LOWER(notifications.body) LIKE LOWER(:search)", {
+        search,
+      });
+    }
 
-    if(status) {
-      query.andWhere('LOWER(notifications.status) LIKE LOWER(:status)', {
-        status: `%${status}`
-      })
-    };
+    const [notifications2, count] = await query.getManyAndCount();
+    // console.log('Count', count);
 
-    const notifications = await query.getMany();
-    return notifications; */
+    return { notifications2, count };
   }
 
   async getSpecificNotification(notificationId: string): Promise<Notification> {
@@ -509,3 +508,43 @@ export class NotificationsService {
     });
   }
 }
+
+/* 
+  1st Attempt;
+
+   async getAllNotification(appToken: string, filterDto: NotificatiionsFilterDto) {
+    const {status, type, searchTerm} = filterDto;
+    
+    const getAppConcerned = await this.notificationsRepo.find({
+      where: {
+        author: { token: appToken },
+      },
+      relations: { author: true },
+    });
+
+    //Cannot see the link between current app && results
+    if (getAppConcerned) {
+    const query = this.notificationsRepo.createQueryBuilder("notification");
+
+      if (status) {
+        query.andWhere("notification.status = :status", { status });
+      }
+      if (type) {
+        query.andWhere("notification.notification_type = :type", { type });
+      }
+      if (searchTerm) {
+        query.andWhere(
+          "LOWER(notification.title) LIKE LOWER(:searchTerm) OR LOWER(notification.subject) LIKE LOWER(:searchTerm)",
+          { searchTerm }
+        );
+      };
+
+      const filteredResults = await query.getManyAndCount();
+      return filteredResults;
+    }
+
+
+  }
+
+
+*/

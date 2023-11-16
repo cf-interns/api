@@ -22,6 +22,7 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import NotificationEvent from "src/services/event.interface";
 import { GetNotificationsFilterDto } from "src/dtos/getNotifications-filter.dto";
 import { object } from "joi";
+import { PaginationParams } from "src/params/pagination.params";
 @UseGuards(JwtAuthGuard)
 @Controller("notifications")
 export class NotificationController {
@@ -86,6 +87,7 @@ export class NotificationController {
   @Get("all-notifications/:appToken")
   async getNotifications(
     @Query() filterDto: GetNotificationsFilterDto,
+    @Query() {offset, limit}: PaginationParams,
 
     @Param("appToken") appToken: string
   ) {
@@ -103,12 +105,13 @@ export class NotificationController {
       this.logger.log("In Filter Service");
       return this.notificationsService.getNotificationsWithFilters(
         filterDto,
-        appToken
+        appToken,
+        offset,limit
       );
     } else {
       this.logger.log("Straight to All Notifications Service");
 
-      return this.notificationsService.getAllNotification(appToken);
+      return this.notificationsService.getAllNotification(appToken,offset,limit);
     }
   }
 
