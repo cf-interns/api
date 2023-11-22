@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 
 export default class EmailDto {
@@ -29,9 +29,11 @@ export default class EmailDto {
     from?: string;
 
     @IsString()
+    @IsOptional()
     token?: string;
 
     @IsString()
+    @IsOptional()
     _id?: string;
 
 }

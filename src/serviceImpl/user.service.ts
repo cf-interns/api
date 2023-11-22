@@ -16,6 +16,7 @@ import { Password } from "src/domains/password.entity";
 import { ResetPasswordDto } from "src/dtos/restPassword.dto";
 import { EmailService } from "./email.service";
 import EmailDto from "src/dtos/email.dto";
+import { UpdateUserInfoDto } from "src/dtos/updateUserInfo.dto";
 
 @Injectable()
 export class UserService {
@@ -191,5 +192,39 @@ export class UserService {
     });
 
     return { message: "Password Successfully Changed!" };
+  }
+
+  async updateUserInfo (user: User,userInfo: UpdateUserInfoDto) {
+    const getUser = await this.getByEmail(user.email);
+    console.log(user.email, '', userInfo.email);
+    
+
+    if (getUser) {
+     const updatedUser = {
+      _id: getUser._id,
+       password: getUser.password,
+       apps: getUser.apps,
+       lastName: userInfo.lastName,
+       firstName: userInfo.firstName,
+       currentHashedRefreshToken: getUser.currentHashedRefreshToken,
+       email: userInfo.email
+     };
+
+     await this.userRepo.update(user._id, updatedUser)
+
+     return {
+      message: 'Success'
+     }
+      
+    };
+
+    throw new NotFoundException('User Not Found!')
+  }
+
+  async deleteUser(_id: string): Promise<void>{
+    const deleteThisUser = await this.userRepo.delete(_id);
+    if (deleteThisUser.affected === 0) {
+      throw new NotFoundException('User Not Found!')
+    }
   }
 }

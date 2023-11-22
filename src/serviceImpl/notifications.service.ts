@@ -176,7 +176,6 @@ export class NotificationsService {
       if (!getNotification) {
         return { message: "No New Messages!" };
       }
-
       let result = await this.mailerService.sendMail(data);
       console.log(result, "SEND EMAIL RESULT");
 
@@ -199,12 +198,15 @@ export class NotificationsService {
         body: data.text,
         subject: data.subject,
         provider: "GMAIL",
-        status: "sucess",
+        status: "SUCCESS",
         request_data: JSON.stringify(data),
         notification_type: "EMAIL",
       });
 
+      
       await this.notificationsRepo.save(sentEmail);
+      console.log("Saved Entity in db!", sentEmail);
+
     } catch (error) {
       this.logger.log(
         "An Error Occured while trying to send an email",
@@ -253,16 +255,20 @@ export class NotificationsService {
   }
 
   async getAllNotification(appToken: string, offset?: number, limit?: number) {
+    console.log(appToken, 'APP TOKEN');
+    
     const [notifications, count] = await this.notificationsRepo.findAndCount({
       where: {
-        author: { token: appToken },
+        author: {
+          token: appToken
+        }
       },
-      relations: { author: true },
       order: {
-        _id: "ASC",
+        _id: 'ASC'
       },
       skip: offset,
-      take: limit,
+      take: limit
+   
     });
     // console.log("Notifications ====>", notifications);
 

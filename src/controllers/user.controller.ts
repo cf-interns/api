@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Req, UseGuards, UsePipes } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Req, UseGuards, UsePipes } from "@nestjs/common";
 import { CreateUserDto } from "src/dtos/createUser.dto";
 import { UserService } from "../serviceImpl/user.service";
 import { User } from "../domains/user.entity";
@@ -9,6 +9,7 @@ import RequestObjectWithUser from "src/services/requestWithUser.interface";
 import { ForgotPasswordDto } from "src/dtos/createPassword.dto";
 import { ResetPasswordDto } from "src/dtos/restPassword.dto";
 import { ChangePasswordDto } from "src/dtos/changePassword.dto";
+import { UpdateUserInfoDto } from "src/dtos/updateUserInfo.dto";
 
 @ApiTags('users')
 
@@ -80,6 +81,18 @@ export class UserController {
         console.log(changePasswordDto.oldPassword, '++++++++++');
         
         return this.userService.changePassword(req.user._id,changePasswordDto);
+    }
+
+
+    @UseGuards(JwtAuthGuard)
+    @Patch('upadate-info')
+    updateUserInfo(@Req() req: RequestObjectWithUser,@Body() UpdateInfoDto: UpdateUserInfoDto){
+        return this.userService.updateUserInfo(req.user,UpdateInfoDto);
+    }
+
+    @Delete(':id')
+    deleteUser(@Param('id') id: string){
+        return this.userService.deleteUser(id);
     }
 
 }
