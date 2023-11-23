@@ -205,7 +205,7 @@ export class NotificationsService {
 
       
       await this.notificationsRepo.save(sentEmail);
-      console.log("Saved Entity in db!", sentEmail);
+      console.log("Saved Entity Auhor??? in db!", sentEmail.author);
 
     } catch (error) {
       this.logger.log(

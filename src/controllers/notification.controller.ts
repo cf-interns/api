@@ -21,7 +21,6 @@ import { NotificationsService } from "src/serviceImpl/notifications.service";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import NotificationEvent from "src/services/event.interface";
 import { GetNotificationsFilterDto } from "src/dtos/getNotifications-filter.dto";
-import { object } from "joi";
 import { PaginationParams } from "src/params/pagination.params";
 @UseGuards(JwtAuthGuard)
 @Controller("notifications")

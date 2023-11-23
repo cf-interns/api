@@ -22,7 +22,9 @@ export class Notification {
   @ManyToOne(
     () => Application,
     (author: Application) => {
-      author.notification;
+      author.notification
+    }, {
+      onDelete: 'CASCADE'
     }
   )
   public author?: Application;

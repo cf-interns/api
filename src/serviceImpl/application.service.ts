@@ -92,6 +92,8 @@ export class ApplicationService {
             where: { _id: _id },
             // relations: ['applications']
         });
+        console.log(app, 'App');
+        
         app.status = status;
         await this.appRepo.save(app);
         return app;

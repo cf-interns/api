@@ -34,7 +34,9 @@ export class Application {
   @Generated("uuid")
   public token: string;
 
-  @ManyToOne(() => User, (author: User) => author.apps)
+  @ManyToOne(() => User, (author: User) => author.apps, {
+    onDelete: 'CASCADE'
+  })
   public author: User;
 
   @OneToMany(

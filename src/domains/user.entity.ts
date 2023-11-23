@@ -25,9 +25,12 @@ export class User {
     @Column({nullable: true})
     public token: string; */
 
+    @Exclude()
     @Column({ nullable: true })
     public currentHashedRefreshToken: string;
 
-    @OneToMany(() => Application, (app: Application) => app.author)
+    @OneToMany(() => Application, (app: Application) => app.author, {
+        cascade: true
+    })
     public apps?: Application[]
 }

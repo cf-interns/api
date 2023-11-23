@@ -22,9 +22,9 @@ export class UserController {
 
 
     @UseGuards(JwtAuthGuard)
-    @Get()
-    async getUserById(@Req()  req: RequestObjectWithUser): Promise<User> {
-        return this.userService.getById(req.user._id);
+    @Get(':id')
+    async getUserById(@Param() id: string): Promise<User> {
+        return this.userService.getById(id);
     }
 
     @ApiOperation({ summary: 'Gets all registered users', description: 'If you want to get all users with their created apps, use this route. This route is protected and only admins can access it. It takes no path or query params' })
