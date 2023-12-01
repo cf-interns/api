@@ -83,6 +83,12 @@ export class NotificationController {
     return this.notificationsService.searchCronMessages();
   }
 
+
+  @Get('all-notifications')
+  async getAllNotifs(){
+    return this.notificationsService.getAllNotificationsInRepo()
+  } 
+ 
   @Get("all-notifications/:appToken")
   async getNotifications(
     @Query() filterDto: GetNotificationsFilterDto,
@@ -104,7 +110,7 @@ export class NotificationController {
       this.logger.log("In Filter Service");
       return this.notificationsService.getNotificationsWithFilters(
         filterDto,
-        appToken,
+        // appToken,
         offset,limit
       );
     } else {

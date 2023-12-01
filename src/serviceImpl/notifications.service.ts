@@ -203,10 +203,8 @@ export class NotificationsService {
         notification_type: "EMAIL",
       });
 
-      
       await this.notificationsRepo.save(sentEmail);
       console.log("Saved Entity Auhor??? in db!", sentEmail.author);
-
     } catch (error) {
       this.logger.log(
         "An Error Occured while trying to send an email",
@@ -254,21 +252,25 @@ export class NotificationsService {
     return { message: "Push Successfully Sent!" };
   }
 
+  async getAllNotificationsInRepo(){
+    return this.notificationsRepo.find()
+  } 
+
+  // All Notifications of a specific app
   async getAllNotification(appToken: string, offset?: number, limit?: number) {
-    console.log(appToken, 'APP TOKEN');
-    
+    console.log(appToken, "APP TOKEN");
+
     const [notifications, count] = await this.notificationsRepo.findAndCount({
       where: {
         author: {
-          token: appToken
-        }
+          token: appToken,
+        },
       },
       order: {
-        _id: 'ASC'
+        _id: "ASC",
       },
       skip: offset,
-      take: limit
-   
+      take: limit,
     });
     // console.log("Notifications ====>", notifications);
 
@@ -277,13 +279,12 @@ export class NotificationsService {
 
   async getNotificationsWithFilters(
     filterDto: GetNotificationsFilterDto,
-    appToken: string,
     offset?: number,
     limit?: number
   ): Promise<object> {
     const { notification_type, status, search } = filterDto;
 
-    //Don't entire NotificationsRepo for GNS. Just search for the concerned application
+    //Don't search entire NotificationsRepo of GNS. Just search for the concerned application
     const query = this.notificationsRepo
       .createQueryBuilder("notifications")
       .orderBy("notifications._id", "ASC")

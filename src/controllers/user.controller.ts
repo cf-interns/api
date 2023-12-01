@@ -11,88 +11,111 @@ import { ResetPasswordDto } from "src/dtos/restPassword.dto";
 import { ChangePasswordDto } from "src/dtos/changePassword.dto";
 import { UpdateUserInfoDto } from "src/dtos/updateUserInfo.dto";
 
-@ApiTags('users')
-
-@Controller('users')
+@ApiTags("users")
+@Controller("users")
 export class UserController {
+  constructor(private readonly userService: UserService) {}
 
-    constructor(
-        private readonly userService: UserService
-    ) { }
+  @ApiOperation({
+    summary: "Gets all registered users",
+    description:
+      "If you want to get all users with their created apps, use this route. This route is protected and only admins can access it. It takes no path or query params",
+  })
+  @ApiResponse({
+    // type: ,
+    status: 200,
+    description: "All the registered users",
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiSecurity("Auth-token")
+  @Get()
+  async getUsers(): Promise<User[]> {
+    return this.userService.getUsers();
+  }
 
+  // @UseGuards(JwtAuthGuard)
+  @Get(":id")
+  async getUserById(@Param('id') id: string): Promise<User> {
+    console.log(id, "====>>>");
 
-    @UseGuards(JwtAuthGuard)
-    @Get(':id')
-    async getUserById(@Param() id: string): Promise<User> {
-        return this.userService.getById(id);
-    }
+    return this.userService.getById(id);
+  }
 
-    @ApiOperation({ summary: 'Gets all registered users', description: 'If you want to get all users with their created apps, use this route. This route is protected and only admins can access it. It takes no path or query params' })
-    @ApiResponse({
-        // type: ,
-        status: 200,
-        description: 'All the registered users'
-    })
-    @UseGuards(JwtAuthGuard)
-    @ApiSecurity('Auth-token')
-    @Get()
-    async getUsers(): Promise<User[]> {
-        return this.userService.getUsers();
-    }
+  // @ApiTags('passwords')
+  @ApiOperation({
+    summary: "Forgot Password",
+    description:
+      "A user can make a request to this route in case they forget their passord. An email will be sent to the user with further instructions",
+  })
+  @ApiResponse({
+    type: ForgotPasswordDto,
+    status: 200,
+    description: "Please Check your email",
+  })
+  @ApiBody({
+    type: ForgotPasswordDto,
+    description: "Email sent with a url containing a token",
+  })
+  @HttpCode(200)
+  @Post("passwords/forgot-password")
+  forgotPassword(@Body() email: ForgotPasswordDto) {
+    // console.log(email.email);
 
+    return this.userService.createPassword(email);
+  }
 
-    // @ApiTags('passwords')
-    @ApiOperation({ summary: 'Forgot Password', description: 'A user can make a request to this route in case they forget their passord. An email will be sent to the user with further instructions' })
-    @ApiResponse({
-        type: ForgotPasswordDto,
-        status: 200,
-        description: 'Please Check your email'
-    })
-    @ApiBody({
-        type: ForgotPasswordDto,
-        description: 'Email sent with a url containing a token'
-    })
-    @HttpCode(200)
-    @Post('passwords/forgot-password')
-    forgotPassword(@Body() email: ForgotPasswordDto) {
-        // console.log(email.email);
+  @ApiOperation({
+    summary: "Password reset",
+    description: "A user can request a password reset using this route",
+  })
+  @ApiBody({
+    type: ResetPasswordDto,
+    description:
+      "User should enter new password and also confirm this new password to reset previous password, most importantly they user has to provide the token sent to their email",
+  })
+  @ApiResponse({
+    description:
+      "The email contains a link with a url having a token which will be used for resetting their password",
+  })
+  @Post("passwords/reset-password")
+  restPassword(@Body() pass: ResetPasswordDto) {
+    return this.userService.resetPassword(pass);
+  }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: "Password reset",
+    description: "A user can request a password reset using this route",
+  })
+  @ApiBody({
+    type: ChangePasswordDto,
+    description: "User should enter current password to change password.",
+  })
+  @ApiResponse({
+    description:
+      "In order to change the user must be authenticated since this endpoint is protected",
+  })
+  @Post("change-password")
+  changePassword(
+    @Req() req: RequestObjectWithUser,
+    @Body() changePasswordDto: ChangePasswordDto
+  ) {
+    console.log(changePasswordDto.oldPassword, "++++++++++");
 
-        return this.userService.createPassword(email)
-    }
+    return this.userService.changePassword(req.user._id, changePasswordDto);
+  }
 
+  @UseGuards(JwtAuthGuard)
+  @Patch("upadate-info")
+  updateUserInfo(
+    @Req() req: RequestObjectWithUser,
+    @Body() UpdateInfoDto: UpdateUserInfoDto
+  ) {
+    return this.userService.updateUserInfo(req.user, UpdateInfoDto);
+  }
 
-    @ApiOperation({ summary: 'Password reset', description: 'A user can request a password reset using this route' })
-    @ApiBody({ type: ResetPasswordDto, description: 'User should enter new password and also confirm this new password to reset previous password, most importantly they user has to provide the token sent to their email' })
-    @ApiResponse({ description: 'The email contains a link with a url having a token which will be used for resetting their password' })
-    @Post('passwords/reset-password')
-    restPassword(@Body() pass: ResetPasswordDto) {
-
-        return this.userService.resetPassword(pass);
-    }
-
-
-    @UseGuards(JwtAuthGuard)
-    @ApiOperation({ summary: 'Password reset', description: 'A user can request a password reset using this route' })
-    @ApiBody({ type: ChangePasswordDto, description: 'User should enter current password to change password.' })
-    @ApiResponse({ description: 'In order to change the user must be authenticated since this endpoint is protected' })
-    @Post('change-password')
-    changePassword(@Req() req: RequestObjectWithUser,@Body() changePasswordDto: ChangePasswordDto) {
-        console.log(changePasswordDto.oldPassword, '++++++++++');
-        
-        return this.userService.changePassword(req.user._id,changePasswordDto);
-    }
-
-
-    @UseGuards(JwtAuthGuard)
-    @Patch('upadate-info')
-    updateUserInfo(@Req() req: RequestObjectWithUser,@Body() UpdateInfoDto: UpdateUserInfoDto){
-        return this.userService.updateUserInfo(req.user,UpdateInfoDto);
-    }
-
-    @Delete(':id')
-    deleteUser(@Param('id') id: string){
-        return this.userService.deleteUser(id);
-    }
-
+  @Delete(":id")
+  deleteUser(@Param("id") id: string) {
+    return this.userService.deleteUser(id);
+  }
 }

@@ -91,7 +91,7 @@ export class UserService {
       user.currentHashedRefreshToken
     );
 
-    if (!isRefreshTokenValid) {
+    if (isRefreshTokenValid) {  
       return user;
     }
   }
