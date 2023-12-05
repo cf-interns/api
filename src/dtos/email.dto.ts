@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsArray, IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 
 export default class EmailDto {
@@ -11,8 +11,10 @@ export default class EmailDto {
     text?: string
 
     @ApiProperty()
+    @IsArray()
+    @IsString({each: true})
     @IsNotEmpty()
-    @IsEmail()
+    // @IsEmail()
     to?: string
 
     @ApiProperty()

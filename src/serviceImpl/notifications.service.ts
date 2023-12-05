@@ -347,7 +347,7 @@ export class NotificationsService {
   // 1- Get notification from db time
   // 2- Compare time & check status.
   //     -- if 'success' don't add to queue else add to queue
-  // @Cron(CronExpression.EVERY_MINUTE)
+   @Cron(CronExpression.EVERY_MINUTE)
   async sendAutomaticEmail() {
     const date = new Date();
 
@@ -391,7 +391,7 @@ export class NotificationsService {
     return { message: "No New Messages to add to the Queue" };
   }
 
-  // @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_MINUTE)
   async sendAutomaticSms() {
     const date = new Date();
     const sms = await this.notificationsRepo.find({

@@ -64,6 +64,10 @@ export class NotificationController {
     @Body() emailDto: CronEmailMessage,
     @Param("appToken") appToken: string
   ) {
+    console.log(emailDto, 'DTO', );
+    console.log(appToken, "Token");
+
+    
     return this.notificationsService.saveMessageToSendInCron(
       emailDto,
       appToken
@@ -75,6 +79,9 @@ export class NotificationController {
     @Body() smsDto: smsDto,
     @Param("appToken") appToken: string
   ) {
+
+    console.log(smsDto, "DTO");
+    console.log(appToken, "Token");
     return this.notificationsService.saveSmsToSendInCron(smsDto, appToken);
   }
 

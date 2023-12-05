@@ -2,7 +2,7 @@ import { IsDate, IsDateString, IsEmail, IsNotEmpty, IsPhoneNumber, IsString } fr
 
 export class CronEmailMessage {
     @IsNotEmpty()
-    @IsEmail()
+    // @IsEmail()
     to: string;
 
 
