@@ -30,13 +30,13 @@ export default class PushNotificationsController {
         return this.pushNotificationService.getPushNotificationById(notification_id)
     }
 
-    @HttpCode(200)
+/*     @HttpCode(200)
     @Post('send-notification/:application_id')
     async sendMessage(@Body() message: PushNotificationDto, @Param('application_id') application_id: string, @GetUser() user: User) {
         console.log(message, '====>>>Token?');
         
         return this.pushNotificationService.sendMessage(message, application_id)
-    }
+    } */
 
     @Delete('application/:id')
     async deleteNotification(@Param('id') notification_id: string) {

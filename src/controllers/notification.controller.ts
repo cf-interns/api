@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   Logger,
   Param,
   Post,
@@ -46,6 +47,7 @@ export class NotificationController {
     return this.notificationsService.sendEmail(emailDto, appToken);
   }
 
+  // @HttpCode(405)
   @Post("send-push/:appToken")
   async sendPush(
     @Body() pushDto: PushNotificationDto,
@@ -64,12 +66,23 @@ export class NotificationController {
     @Body() emailDto: CronEmailMessage,
     @Param("appToken") appToken: string
   ) {
-    console.log(emailDto, 'DTO', );
+    console.log(emailDto, "DTO");
     console.log(appToken, "Token");
 
-    
     return this.notificationsService.saveMessageToSendInCron(
       emailDto,
+      appToken
+    );
+  }
+
+  @Post("automatic-push/:appToken")
+  async sendPushMessage(
+    @Body() message: PushNotificationDto,
+    @Param("appToken") appToken: string
+  ) {
+
+    return this.notificationsService.savePushMessageToSendInCron(
+      message,
       appToken
     );
   }
@@ -79,7 +92,6 @@ export class NotificationController {
     @Body() smsDto: smsDto,
     @Param("appToken") appToken: string
   ) {
-
     console.log(smsDto, "DTO");
     console.log(appToken, "Token");
     return this.notificationsService.saveSmsToSendInCron(smsDto, appToken);
@@ -90,16 +102,15 @@ export class NotificationController {
     return this.notificationsService.searchCronMessages();
   }
 
+  @Get("all-notifications")
+  async getAllNotifs() {
+    return this.notificationsService.getAllNotificationsInRepo();
+  }
 
-  @Get('all-notifications')
-  async getAllNotifs(){
-    return this.notificationsService.getAllNotificationsInRepo()
-  } 
- 
   @Get("all-notifications/:appToken")
   async getNotifications(
     @Query() filterDto: GetNotificationsFilterDto,
-    @Query() {offset, limit}: PaginationParams,
+    @Query() { offset, limit }: PaginationParams,
 
     @Param("appToken") appToken: string
   ) {
@@ -118,12 +129,17 @@ export class NotificationController {
       return this.notificationsService.getNotificationsWithFilters(
         filterDto,
         // appToken,
-        offset,limit
+        offset,
+        limit
       );
     } else {
       this.logger.log("Straight to All Notifications Service");
 
-      return this.notificationsService.getAllNotification(appToken,offset,limit);
+      return this.notificationsService.getAllNotification(
+        appToken,
+        offset,
+        limit
+      );
     }
   }
 

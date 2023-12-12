@@ -13,6 +13,7 @@ import {
   AUTOMATIC_NOTIFICATIONS_QUEUE,
   NOTIFICATIONS_PROCESS,
   NOTIFICATIONS_PROCESS_SMS,
+  NOTIFICATIONS_PROCESS_PUSH,
 } from "src/common/constants";
 import { NotificationsService } from "src/serviceImpl/notifications.service";
 
@@ -48,18 +49,34 @@ export class NotificationsProcessor {
     }
   }
 
+  @Process(NOTIFICATIONS_PROCESS_PUSH)
+  public async sendPushCron(job: Job<any>) {
+    try {
+      console.log("hello push data", job.data);
+
+      this.logger.log(
+        `PushDto in NOTIFICATION_PROCESS: ${JSON.stringify(job.data)} `
+      );
+  
+      return this._notificationService.sendPush(job.data, job.data.appToken);
+    } catch (error) {
+      this.logger.error(
+        `Failed to send automatic Push notification '${job.data}'`
+      );
+    }
+  }
+
   @Process(NOTIFICATIONS_PROCESS_SMS)
   public async sendSMSCron(job: Job<any>) {
     try {
       this.logger.log(
         `SMS Dto in NOTIFICATION_PROCESS_SMS: ${JSON.stringify(job.data)} `
       );
-    return this._notificationService.sendSMS(job.data, job.data.appToken);
-      
+      return this._notificationService.sendSMS(job.data, job.data.appToken);
     } catch (error) {
-       this.logger.error(
-         `Failed to send automatic sms notification '${job.data}'`
-       );
+      this.logger.error(
+        `Failed to send automatic sms notification '${job.data}'`
+      );
     }
   }
 
@@ -81,3 +98,17 @@ export class NotificationsProcessor {
     );
   }
 }
+
+
+
+/* 
+  if (email.token) {
+        if (getNotification) {
+          return this.changeCronStatus(email._id);
+        }
+        this.logger.log(
+          `Gotcha :) Cron Email with token ${email.token} found!`
+        );
+      }
+
+*/

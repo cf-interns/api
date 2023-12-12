@@ -60,7 +60,7 @@ export default class PushNotificationsService {
     return findThisPush;
   }
 
-  async sendMessage(message: PushNotificationDto, applicationId: string) {
+ /*  async sendMessage(message: PushNotificationDto, applicationId: string) {
     // console.log(applicationId, 'ID+++++');
 
     const app = await this.applicationRepository.findOne({
@@ -71,7 +71,7 @@ export default class PushNotificationsService {
     }
     // console.log(message);
     getMessaging()
-      .send(message)
+      .sendM(message)
       .then(async (res) => {
         const savePush = new Push();
         savePush.title = message.notification.title;
@@ -91,7 +91,7 @@ export default class PushNotificationsService {
         throw new HttpException("Something went wrong", HttpStatus.BAD_REQUEST);
       });
     return { message: "Successfully sent message" };
-  }
+  } */
 
   async deletePushNotification(pushId: string): Promise<object> {
     const deleteThisPush = await this.pushRepo.delete(pushId);

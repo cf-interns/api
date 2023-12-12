@@ -29,8 +29,8 @@ export class Notification {
   )
   public author?: Application;
 
-  @Column()
-  public recipient?: string;
+  @Column({nullable: true})
+  public recipient?: string ;
 
   @Generated("uuid")
   public external_id: string;

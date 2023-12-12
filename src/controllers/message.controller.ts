@@ -51,12 +51,12 @@ export class MessageController {
         }
     }
 
-    @Post('/push/:application_id')
+ /*    @Post('/push/:application_id')
     async sendPush(@Body() push1: PushNotificationDto, @Param('application_id') appId: string) {
         this.logger.verbose(`Application with id "${appId}" creating a Job for sending a push  every hour after 55 minutes "${JSON.stringify(push1)}"`)
 
         return this.messageService.sendPushByHour( 55, push1, appId)
-    }
+    } */
 
     @Delete(':cron_name')
     deleteCron(@Param('cron_name') name: string) {

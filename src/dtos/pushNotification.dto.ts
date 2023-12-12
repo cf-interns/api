@@ -1,20 +1,31 @@
 import { ApiProperty } from "@nestjs/swagger"
-import { IsNotEmpty, IsObject, IsString } from "class-validator"
+import { IsArray, IsDateString, IsNotEmpty, IsObject, IsOptional, IsString } from "class-validator"
 
 
 export class PushNotificationDto {
+  @ApiProperty()
+  @IsObject()
+  @IsNotEmpty()
+  notification: {
+    body: string;
+    title: string;
+    // icon: string | null
+  };
 
-    @ApiProperty()
-    @IsObject()
-    @IsNotEmpty()
-    notification: {
-        body: string,
-        title: string,
-        // icon: string | null
-    }
+  @ApiProperty()
+  @IsArray()
+  @IsNotEmpty()
+  userToken: string[];
 
-    @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
-    token: string  
+  @IsString()
+  @IsOptional()
+  _id?: string;
+
+  @IsString()
+  @IsOptional()
+  token?: string;
+
+  @IsOptional()
+  @IsDateString()
+  time?: string;
 }

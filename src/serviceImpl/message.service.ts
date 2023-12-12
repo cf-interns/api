@@ -92,7 +92,7 @@ export class MessageService {
         
         
     }
-
+/* 
     async sendPushByHour( minute:number, push:PushNotificationDto, appId:string) {
 
         const verifyApp = await this.App.getAppByToken(appId);
@@ -119,7 +119,7 @@ export class MessageService {
       throw new HttpException('Please Activate Your App', HttpStatus.UNAUTHORIZED)
 
         
-    }
+    } */
 
     async deleteCron(name: string) {
         this.schedulerRegistry.deleteCronJob(name);

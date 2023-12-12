@@ -1,17 +1,20 @@
 import {
   AUTOMATIC_NOTIFICATIONS_QUEUE,
   NOTIFICATIONS_PROCESS,
+  NOTIFICATIONS_PROCESS_PUSH,
   NOTIFICATIONS_PROCESS_SMS,
 } from "./../common/constants/index";
 import { AxiosError } from "axios";
 import { HttpService } from "@nestjs/axios";
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -59,11 +62,10 @@ export class NotificationsService {
       },
     });
 
-    if (app.status !== "ACTIVE") {
-      throw new HttpException(
-        "Please Activate Your Application",
-        HttpStatus.UNAUTHORIZED
-      );
+    if (app.status === "INACTIVE") {
+      console.log(app.status);
+
+      throw new BadRequestException("Please Activate Your Application");
     }
 
     const url = this.configService.get<string>("nexah.url");
@@ -159,10 +161,12 @@ export class NotificationsService {
       const app = await this.appService.getAppByToken(appToken);
 
       if (app.status === "INACTIVE") {
-        throw new HttpException(
+
+        return new HttpException('Not Authorised!', HttpStatus.UNAUTHORIZED)
+       /*  throw new HttpException(
           "Please Activate Your Application",
           HttpStatus.UNAUTHORIZED
-        );
+        ); */
       }
 
       let data = {
@@ -210,51 +214,102 @@ export class NotificationsService {
         "An Error Occured while trying to send an email",
         error.stack
       );
-      throw new InternalServerErrorException(`An Error occured`);
+      throw new BadRequestException(`An Error occured`);
     }
     return { message: "Email Successfully Sent" };
   }
 
-  async sendPush(
-    message: PushNotificationDto,
-    appToken: string
-  ): Promise<object> {
+  async sendPush(message: PushNotificationDto, appToken: string) {
     const app = await this.appService.getAppByToken(appToken);
 
-    if (app.status !== "ACTIVE") {
-      throw new HttpException(
+    if (app.status === "INACTIVE") {
+      throw new BadRequestException("Please Activate Your App!");
+
+      /* throw new HttpException(
         "Please Activate Your Application",
         HttpStatus.UNAUTHORIZED
-      );
+      ); */
     }
 
-    getMessaging()
-      .send(message)
+    const getNotification = this.notificationsRepo.findOne({
+      where: {
+        _id: message._id,
+        notification_type: "AUTOMATIC",
+        status: "PENDING",
+      },
+    });
+
+    let data2send = {
+      notification: message.notification,
+      token: message.userToken.toString(),
+      // dryRun: true,
+      // condition: ''
+    };
+    this.logger.log(`Push: ${data2send.notification.title}`);
+
+ 
+    if (!getNotification) {
+      return { message: "No New Messages!" };
+    }
+
+    console.log("DATA 2 SEND Message ID FCM ===>>>", data2send);
+
+    await getMessaging()
+      .send(data2send)
       .then(async (res) => {
-        const savePushMessage = await this.notificationsRepo.create({
-          title: message.notification.title,
-          body: message.notification.body,
+
+        if (message.token) {
+          if (getNotification) {
+            this.logger.log(
+              `Gotcha :) Cron Push with token ${message.token} found!`
+            );
+            return this.changeCronStatus(message._id);
+          }
+        }
+        const savePushMessage = this.notificationsRepo.create({
+          title: data2send.notification.title,
+          body: data2send.notification.body,
           author: app,
-          status: "success",
+          status: "SUCCESS",
           provider: "FCM",
           notification_type: "PUSH",
+          request_data: JSON.stringify(message.notification),
+          sent_by: app.appName,
+          // recipient:
         });
 
         await this.notificationsRepo.save(savePushMessage);
         this.logger.log(`Notification Successfully Sent ${res}`);
+        console.log(savePushMessage, "SAVED PUSH MESSAGE");
+
+        return { message: "Push Successfully Sent!" };
       })
       .catch((error) => {
         this.logger.log(`An error occured while sending push`, error.stack);
+        console.log(error, "ERRRRRRRR");
+        if (
+          error?.errorInfo?.message ===
+          "The registration token is not a valid FCM registration token"
+        ) {
+          throw new BadRequestException("Invalid FCM registration token");
+        }
 
-        throw new HttpException("Something went wrong", HttpStatus.BAD_REQUEST);
+        /* 
+       errorInfo: {
+    code: 'messaging/invalid-argument',
+    message: 'The registration token is not a valid FCM registration token'
+  }, */
+
+        throw new HttpException(
+          "Push Notification Not Sent",
+          HttpStatus.BAD_REQUEST
+        );
       });
-
-    return { message: "Push Successfully Sent!" };
   }
 
-  async getAllNotificationsInRepo(){
-    return this.notificationsRepo.find()
-  } 
+  async getAllNotificationsInRepo() {
+    return this.notificationsRepo.find();
+  }
 
   // All Notifications of a specific app
   async getAllNotification(appToken: string, offset?: number, limit?: number) {
@@ -347,7 +402,7 @@ export class NotificationsService {
   // 1- Get notification from db time
   // 2- Compare time & check status.
   //     -- if 'success' don't add to queue else add to queue
-   @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_MINUTE)
   async sendAutomaticEmail() {
     const date = new Date();
 
@@ -389,6 +444,47 @@ export class NotificationsService {
     }
 
     return { message: "No New Messages to add to the Queue" };
+  }
+
+  @Cron(CronExpression.EVERY_MINUTE)
+  async sendAutomaticPushNotification() {
+    const date = new Date();
+
+    const messages = await this.notificationsRepo.find({
+      where: {
+        timeData: LessThanOrEqual(moment(date).format("MMM Do YY, h:mm:ss a")),
+        status: "PENDING",
+        notification_type: "AUTOMATIC",
+      },
+      relations: {
+        author: true,
+      },
+    });
+
+    if (messages) {
+      messages.map((m) => {
+        const messageTosend = {
+          notification: {
+            title: m.title,
+            body: m.body,
+          },
+          userToken: [m.recipient],
+          _id: m._id,
+          token: m.token //<<<======
+        };
+
+        this.logger.log(
+          `LOG 2 Push Message to send:  ${JSON.stringify(messageTosend)}`
+        );
+
+        return this.automaticNotificationsQueue.add(
+          NOTIFICATIONS_PROCESS_PUSH,
+          messageTosend
+        );
+      });
+    }
+
+    return { message: "No New Push Messages to add to the Queue" };
   }
 
   @Cron(CronExpression.EVERY_MINUTE)
@@ -434,7 +530,7 @@ export class NotificationsService {
         status: "PENDING",
         request_data: JSON.stringify(email),
         sent_by: email.from,
-        timeData: moment(email.time).format("MMM Do YY"),
+        timeData: moment(email.time).format("MMM Do YY, h:mm:ss a"),
         author: getApp,
         notification_type: "AUTOMATIC",
       });
@@ -449,31 +545,66 @@ export class NotificationsService {
     }
   }
 
+  async savePushMessageToSendInCron(
+    message: PushNotificationDto,
+    appToken: string
+  ) {
+    console.log("TOKENS", message.token);
+
+    try {
+      // const [token]  = message;
+      const getApp = await this.appService.getAppByToken(appToken);
+      const savePushMessage = this.notificationsRepo.create({
+        title: message.notification.title,
+        body: message.notification.body,
+        author: getApp,
+        status: "PENDING",
+        provider: "FCM",
+        notification_type: "AUTOMATIC",
+        request_data: JSON.stringify(message.notification),
+        timeData: moment(message.time).format("MMM Do YY, h:mm:ss a"),
+        sent_by: getApp.appName,
+        recipient: message.userToken.toString(),
+      });
+      await this.notificationsRepo.save(savePushMessage);
+    } catch (error) {
+      this.logger.error(
+        `An error occured while trying to save push message`,
+        error.stack
+      );
+      throw error;
+    }
+  }
+
   async saveSmsToSendInCron(sms: smsDto, appToken: string) {
     const getApp = await this.appService.getAppByToken(appToken);
     if (getApp) {
-      const saveMessage = this.notificationsRepo.create({
-        notification_type: "AUTOMATIC",
-        body: sms.message,
-        provider: "Nexah",
-        recipient: sms.mobiles,
-        author: getApp,
-        request_data: JSON.stringify(sms),
-        // response_data: extractInfo(smsResult, "errordescription"),
-        // external_id: extractInfo(smsResult, "messageid"),
-        sent_by: getApp.appName,
-        timeData: sms.time,
-        status: "PENDING",
-      });
+      if (getApp.status === "ACTIVE") {
+        const saveMessage = this.notificationsRepo.create({
+          notification_type: "AUTOMATIC",
+          body: sms.message,
+          provider: "Nexah",
+          recipient: sms.mobiles,
+          author: getApp,
+          request_data: JSON.stringify(sms),
+          // response_data: extractInfo(smsResult, "errordescription"),
+          // external_id: extractInfo(smsResult, "messageid"),
+          sent_by: getApp.appName,
+          timeData: moment(sms.time).format("MMM Do YY, h:mm:ss a"), // moment(message.time).format("MMM Do YY, h:mm:ss a")
+          status: "PENDING",
+        });
 
-      return this.notificationsRepo.save(saveMessage);
+        return this.notificationsRepo.save(saveMessage);
+      } else {
+        throw new BadRequestException("Please activate your app!");
+      }
     }
-
-    throw new NotFoundException("Application Not Found!");
+    throw new NotFoundException("Application Not Fpound!");
   }
 
   async searchCronMessages() {
     const messages = await this.notificationsRepo.find({
+      // Condition should contain but not limited to string 'AUTOMATIC'
       where: { notification_type: "AUTOMATIC" },
     });
 
@@ -503,55 +634,41 @@ export class NotificationsService {
       this.logger.log(`Cannot Find Message`);
       throw new NotFoundException("Message Not Found!");
     }
-    // getMeessage.status = "SUCCESS";
+    if (getMeessage.provider === "GMAIL") {
+      return await this.notificationsRepo.save({
+        ...getMeessage,
+        status: "SUCCESS",
+        notification_type: "EMAIL",
+        provider: "GMAIL",
+      });
+    }
+
+    if (getMeessage.provider === "Nexah") {
+      return await this.notificationsRepo.save({
+        ...getMeessage,
+        status: "SUCCESS",
+        notification_type: "SMS",
+        provider: "Nexah",
+      });
+    }
+
+    if (getMeessage.provider === "Nexah") {
+      return await this.notificationsRepo.save({
+        ...getMeessage,
+        status: "SUCCESS",
+        notification_type: "PUSH",
+        provider: "FCM",
+      });
+    };
 
     this.logger,
       log(
         `Message with token ${getMeessage.token} status successfully changed!`
       );
+    //TODO: Fix code redundancy
     return await this.notificationsRepo.save({
       ...getMeessage,
       status: "SUCCESS",
     });
   }
 }
-
-/* 
-  1st Attempt;
-
-   async getAllNotification(appToken: string, filterDto: NotificatiionsFilterDto) {
-    const {status, type, searchTerm} = filterDto;
-    
-    const getAppConcerned = await this.notificationsRepo.find({
-      where: {
-        author: { token: appToken },
-      },
-      relations: { author: true },
-    });
-
-    //Cannot see the link between current app && results
-    if (getAppConcerned) {
-    const query = this.notificationsRepo.createQueryBuilder("notification");
-
-      if (status) {
-        query.andWhere("notification.status = :status", { status });
-      }
-      if (type) {
-        query.andWhere("notification.notification_type = :type", { type });
-      }
-      if (searchTerm) {
-        query.andWhere(
-          "LOWER(notification.title) LIKE LOWER(:searchTerm) OR LOWER(notification.subject) LIKE LOWER(:searchTerm)",
-          { searchTerm }
-        );
-      };
-
-      const filteredResults = await query.getManyAndCount();
-      return filteredResults;
-    }
-
-
-  }
-
-
-*/
