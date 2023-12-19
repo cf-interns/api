@@ -1,31 +1,30 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { IsDate, IsDateString, IsEmail, IsNotEmpty, IsPhoneNumber, IsString } from "class-validator";
 
 export class CronEmailMessage {
-    @IsNotEmpty()
-    // @IsEmail()
-    to: string;
+  @ApiProperty()
+  @IsNotEmpty()
+  // @IsEmail()
+  to: string;
 
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  text: string;
 
-    @IsNotEmpty()
-    @IsString()
-    text: string;
+  @ApiProperty()
+  @IsEmail()
+  @IsNotEmpty()
+  from: string;
 
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  subject: string;
 
-    @IsEmail()
-    @IsNotEmpty()
-    from: string;
+  @ApiProperty()
 
-
-    @IsNotEmpty()
-    @IsString()
-    subject: string;
-
-    // @IsNotEmpty()
-    @IsDateString()
-    time: string;
-
-    
-
-
-
+  // @IsNotEmpty()
+  @IsDateString()
+  time: string;
 }

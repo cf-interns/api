@@ -102,7 +102,6 @@ export class AuthController {
     return user;
   }
 
-
   
   @ApiOperation({
     summary: "Logout a user",

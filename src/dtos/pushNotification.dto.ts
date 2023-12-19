@@ -17,14 +17,17 @@ export class PushNotificationDto {
   @IsNotEmpty()
   userToken: string[];
 
+  @ApiProperty()
   @IsString()
   @IsOptional()
   _id?: string;
 
+  @ApiProperty()
   @IsString()
   @IsOptional()
   token?: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsDateString()
   time?: string;

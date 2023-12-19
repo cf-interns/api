@@ -2,13 +2,13 @@ import { IsAlpha, IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validat
 
 export class CreateUserDto {
     @IsNotEmpty()
-    @IsAlpha()
+    // @IsAlpha()
     @IsString()
     firstName: string;
 
     @IsNotEmpty()
     @IsString()
-    @IsAlpha()
+    // @IsAlpha()
     lastName: string;
 
     @IsEmail()

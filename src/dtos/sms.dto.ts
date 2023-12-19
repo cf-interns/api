@@ -13,11 +13,14 @@ export class smsDto {
   @IsPhoneNumber("CM")
   mobiles: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsDateString()
   time?: string;
 
+  @ApiProperty()
   _id?: string;
 
+  @ApiProperty()
   token?: string;
 }

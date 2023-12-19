@@ -1,4 +1,3 @@
-import EmailDto from "src/dtos/email.dto";
 import {
   OnQueueActive,
   OnQueueCompleted,
@@ -24,7 +23,6 @@ export class NotificationsProcessor {
 
   constructor(
     private readonly _notificationService: NotificationsService,
-    private readonly _configService: ConfigService
   ) {}
 
   @Process(NOTIFICATIONS_PROCESS)
@@ -99,16 +97,3 @@ export class NotificationsProcessor {
   }
 }
 
-
-
-/* 
-  if (email.token) {
-        if (getNotification) {
-          return this.changeCronStatus(email._id);
-        }
-        this.logger.log(
-          `Gotcha :) Cron Email with token ${email.token} found!`
-        );
-      }
-
-*/

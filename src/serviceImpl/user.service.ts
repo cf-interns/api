@@ -102,7 +102,7 @@ export class UserService {
     await this.userRepo.save(user);
   }
 
-  //Save hash of Refresh_Token
+  //Save hashed of Refresh_Token
   async setCurrentRefreshToken(
     refreshToken: string,
     userId: string
@@ -131,7 +131,7 @@ export class UserService {
       console.log(error);
 
       throw new BadRequestException(
-        "Icorrect Password. Please enter the current password"
+        "Incorrect Password. Please enter the current password"
       );
     }
   }
@@ -193,8 +193,8 @@ export class UserService {
   }
 
   async updateUserInfo(user: User, userInfo: UpdateUserInfoDto) {
-    const getUser = await this.getByEmail(user.email);
-    console.log(user.email, "", userInfo.email);
+    const getUser = await this.getByEmail(userInfo.email);
+    // console.log(user.firstName, "", userInfo.lastName);
 
     if (getUser) {
       const updatedUser = {
@@ -204,10 +204,10 @@ export class UserService {
         lastName: userInfo.lastName,
         firstName: userInfo.firstName,
         currentHashedRefreshToken: getUser.currentHashedRefreshToken,
-        email: userInfo.email,
+        email: getUser.email,
       };
 
-      await this.userRepo.update(user._id, updatedUser);
+      await this.userRepo.update(getUser._id, updatedUser);
 
       return {
         message: "Success",

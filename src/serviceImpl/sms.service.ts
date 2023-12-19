@@ -154,17 +154,3 @@ export class SmsService {
         return {message: 'SMS Deleted!'}
     }
 }
-
-
-
-
-/* message: 'Testing GNS App 3',
-  status: 'success',
-  provider: 'Nexah',
-  sent_to: 'success',
-  smsclientid: 'success',
-  messageid: 'success',
-  errorcode: 'success',
-  errordescription: 'success',
-  totalSmsUnit: 'success',
-  balance: 'success', */

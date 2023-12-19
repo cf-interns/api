@@ -404,18 +404,21 @@ export class NotificationsService {
   //     -- if 'success' don't add to queue else add to queue
   @Cron(CronExpression.EVERY_MINUTE)
   async sendAutomaticEmail() {
+    
     const date = new Date();
 
     const messages = await this.notificationsRepo.find({
       where: {
-        timeData: LessThanOrEqual(moment(date).format("MMM Do YY")),
+        timeData: LessThanOrEqual(moment(date).format("MMM Do YYh:mm:ss a")),
         status: "PENDING",
         notification_type: "AUTOMATIC",
+        provider: "GMAIL",
       },
       relations: {
         author: true,
       },
     });
+
 
     if (messages) {
       messages.map((m) => {
@@ -455,6 +458,7 @@ export class NotificationsService {
         timeData: LessThanOrEqual(moment(date).format("MMM Do YY, h:mm:ss a")),
         status: "PENDING",
         notification_type: "AUTOMATIC",
+        provider: 'FCM'
       },
       relations: {
         author: true,
@@ -489,17 +493,21 @@ export class NotificationsService {
 
   @Cron(CronExpression.EVERY_MINUTE)
   async sendAutomaticSms() {
+
     const date = new Date();
     const sms = await this.notificationsRepo.find({
       where: {
-        timeData: LessThanOrEqual(moment(date).format("MMM Do YY")),
+        timeData: LessThanOrEqual(moment(date).format("MMM Do YY:h:mm:ss a")),
         status: "PENDING",
         notification_type: "AUTOMATIC",
+        provider: "Nexah",
       },
       relations: {
         author: true,
       },
     });
+    console.log("SMS cron running... message??", sms);
+
     //testlabhub67#$
     if (sms) {
       sms.map((msg) => {
@@ -517,32 +525,39 @@ export class NotificationsService {
   async saveMessageToSendInCron(email: CronEmailMessage, appToken: string) {
     const getApp = await this.appService.getAppByToken(appToken);
 
-    try {
-      this.logger.log(
-        `Saving Email Message to send in cron, EmaailRecipient:  ${JSON.stringify(
-          email.to
-        )}  appId: ${appToken}`
-      );
-      const saveMessage = this.notificationsRepo.create({
-        subject: email.subject,
-        recipient: email.to,
-        body: email.text,
-        status: "PENDING",
-        request_data: JSON.stringify(email),
-        sent_by: email.from,
-        timeData: moment(email.time).format("MMM Do YY, h:mm:ss a"),
-        author: getApp,
-        notification_type: "AUTOMATIC",
-      });
+    if (getApp.status === 'ACTIVE') {
+         try {
+           this.logger.log(
+             `Saving Email Message to send in cron, EmaailRecipient:  ${JSON.stringify(
+               email.to
+             )}  appId: ${appToken}`
+           );
+           const saveMessage = this.notificationsRepo.create({
+             subject: email.subject,
+             recipient: email.to,
+             body: email.text,
+             status: "PENDING",
+             request_data: JSON.stringify(email),
+             sent_by: email.from,
+             timeData: moment(email.time).format("MMM Do YY, h:mm:ss a"),
+             author: getApp,
+             notification_type: "AUTOMATIC",
+             provider: "GMAIL",
+           });
 
-      return this.notificationsRepo.save(saveMessage);
-    } catch (error) {
-      this.logger.error(
-        `An error occured while trying to save message`,
-        error.stack
-      );
-      throw error;
+           return this.notificationsRepo.save(saveMessage);
+         } catch (error) {
+           this.logger.error(
+             `An error occured while trying to save message`,
+             error.stack
+           );
+           throw error;
+         }
+    } else {
+      throw new BadRequestException('Please Activate Your App')
     }
+
+  
   }
 
   async savePushMessageToSendInCron(

@@ -19,7 +19,7 @@ export class UserController {
   @ApiOperation({
     summary: "Gets all registered users",
     description:
-      "If you want to get all users with their created apps, use this route. This route is protected and only admins can access it. It takes no path or query params",
+      "Get all all users with associated applications. This route is accessible only for admins. It takes no path or query params",
   })
   @ApiResponse({
     // type: ,
@@ -33,9 +33,15 @@ export class UserController {
     return this.userService.getUsers();
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
+  @Get("authenticated-user")
+  async authenticatedUser(@Req() req: RequestObjectWithUser) {
+    return this.userService.getById(req.user._id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Get(":id")
-  async getUserById(@Param('id') id: string): Promise<User> {
+  async getUserById(@Param("id") id: string): Promise<User> {
     console.log(id, "====>>>");
 
     return this.userService.getById(id);

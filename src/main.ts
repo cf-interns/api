@@ -13,6 +13,7 @@ import SmsModule from "./modules/sms/sms.module";
 import { EmailModule } from "./modules/email/email.module";
 import {initializeApp, applicationDefault} from 'firebase-admin/app';
 import PushNotificationsModule from "./modules/pushNotifications/pushnotification.module";
+import { NotifcationsModule } from "./modules/notifications/notifications.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -70,7 +71,7 @@ initializeApp({
     .addTag('docs')
     .build();
   const document = SwaggerModule.createDocument(app, config, {
-    include: [UserModule, AuthModule, ApplicationModule, SmsModule, EmailModule, PushNotificationsModule]
+    include: [UserModule, AuthModule, ApplicationModule, NotifcationsModule]
   });
   SwaggerModule.setup('api', app, document);
   await app.listen(port);
