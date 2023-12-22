@@ -22,20 +22,21 @@ export class Notification {
   @ManyToOne(
     () => Application,
     (author: Application) => {
-      author.notification
-    }, {
-      onDelete: 'CASCADE'
+      author.notification;
+    },
+    {
+      onDelete: "CASCADE",
     }
   )
   public author?: Application;
 
-  @Column({nullable: true})
-  public recipient?: string ;
+  @Column({ nullable: true })
+  public recipient?: string;
 
   @Generated("uuid")
   public external_id: string;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: "timestamptz" })
   public created_at: Date;
 
   @Column()
@@ -71,7 +72,7 @@ export class Notification {
   @Column({ nullable: true })
   public notification_type: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   timeData: string;
 
   get messageTime(): LocalDateTime {
@@ -80,7 +81,7 @@ export class Notification {
   }
 
   set messageTime(value: LocalDateTime) {
-    this.timeData = JSON.stringify(value)
+    this.timeData = JSON.stringify(value);
   }
 
   //we use getters and setters to facilitate the serialization and deserialization of LocalDateTime objects, storing them as JSON strings in the database. This approach ensures that we maintain a precise representation of date and time, catering to the local time context effectively.
