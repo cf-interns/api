@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { ApplicationDto } from 'src/dtos/createApplication.dto';
 import { AppStatus } from '../enums/app-status.enum';
 import { User } from '../domains/user.entity';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class ApplicationService {
@@ -106,6 +107,20 @@ export class ApplicationService {
         if (deleteThisApp.affected === 0) {
             throw new NotFoundException('Application Not Found!');
         }
+    };
+
+    async regenerateAppToken(id: string){
+        const getApp = await this.appRepo.findOne({
+            where: {_id: id}
+        });
+
+        const newToken = randomUUID();
+
+        getApp.token = newToken;
+        await this.appRepo.save(getApp);
+
+        return getApp;
+
     }
 
     

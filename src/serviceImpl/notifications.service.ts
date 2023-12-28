@@ -33,7 +33,6 @@ import { InjectQueue } from "@nestjs/bull";
 import { Queue } from "bull";
 import { Cron, CronExpression } from "@nestjs/schedule";
 import { CronEmailMessage } from "src/dtos/cronEmail.dot";
-import { DateTime } from "luxon";
 import * as moment from "moment";
 import { GetNotificationsFilterDto } from "src/dtos/getNotifications-filter.dto";
 
@@ -173,7 +172,7 @@ export class NotificationsService {
         to: email.to,
         from: email.from,
         subject: email.subject,
-        text: email.text,
+        html: email.html,
       };
       this.logger.log(`Email Address: ${data.to}`);
 
@@ -199,7 +198,7 @@ export class NotificationsService {
         recipient: data.to,
         author: app,
         sent_by: result.envelope?.from,
-        body: data.text,
+        body: data.html,
         subject: data.subject,
         provider: "GMAIL",
         status: "SUCCESS",
@@ -225,10 +224,7 @@ export class NotificationsService {
     if (app.status === "INACTIVE") {
       throw new BadRequestException("Please Activate Your App!");
 
-      /* throw new HttpException(
-        "Please Activate Your Application",
-        HttpStatus.UNAUTHORIZED
-      ); */
+    
     }
 
     const getNotification = this.notificationsRepo.findOne({
@@ -327,7 +323,6 @@ export class NotificationsService {
       skip: offset,
       take: limit,
     });
-    // console.log("Notifications ====>", notifications);
 
     return { notifications, count };
   }
