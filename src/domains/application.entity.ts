@@ -8,10 +8,9 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { User } from "./user.entity";
-import { Push } from "./pushNotification.entity";
-import { Email } from "./email.entity";
-import { Sms } from "./sms.entity";
+
 import Notification from "./notifications.entity";
+import { Email } from "./email.entity";
 
 @Entity()
 export class Application {
@@ -47,12 +46,17 @@ export class Application {
   )
   public notification: Notification[];
 
-  @OneToMany(() => Push, (push: Push) => push.author)
-  push?: Push[];
+
+  @Column()
+  @Generated('uuid')
+  api_key: string;
+
+  // @OneToMany(() => Push, (push: Push) => push.author)
+  // push?: Push[];
 
   @OneToMany(() => Email, (email: Email) => email.author)
   email?: Email[];
 
-  @OneToMany(() => Sms, (sms: Sms) => sms.author)
-  sms?: Sms[];
+  // @OneToMany(() => Sms, (sms: Sms) => sms.author)
+  // sms?: Sms[];
 }

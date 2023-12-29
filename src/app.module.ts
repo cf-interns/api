@@ -13,9 +13,9 @@ import { AuthModule } from "./modules/auth/auth.module";
 import * as Joi from "joi";
 import { ApplicationModule } from "./modules/application/application.module";
 import { EmailModule } from "./modules/email/email.module";
-import SmsModule from "./modules/sms/sms.module";
-import PushNotificationsModule from "./modules/pushNotifications/pushnotification.module";
-import {MessageModule} from "./modules/messages/messages.module";
+// import SmsModule from "./modules/sms/sms.module";
+// import PushNotificationsModule from "./modules/pushNotifications/pushnotification.module";
+// import {MessageModule} from "./modules/messages/messages.module";
 import { NotifcationsModule } from "./modules/notifications/notifications.module";
 
 

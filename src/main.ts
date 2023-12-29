@@ -9,10 +9,10 @@ import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import { UserModule } from "./modules/user/user.module";
 import { AuthModule } from "./modules/auth/auth.module";
 import { ApplicationModule } from "./modules/application/application.module";
-import SmsModule from "./modules/sms/sms.module";
+// import SmsModule from "./modules/sms/sms.module";
 import { EmailModule } from "./modules/email/email.module";
 import {initializeApp, applicationDefault} from 'firebase-admin/app';
-import PushNotificationsModule from "./modules/pushNotifications/pushnotification.module";
+// import PushNotificationsModule from "./modules/pushNotifications/pushnotification.module";
 import { NotifcationsModule } from "./modules/notifications/notifications.module";
 
 async function bootstrap() {

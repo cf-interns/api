@@ -4,11 +4,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 import {CronJob} from 'cron';
 import { Message } from "src/domains/message.entity";
 import { Repository } from "typeorm";
-import { SmsService } from "./sms.service";
+// import { SmsService } from "./sms.service";
 import { smsDto } from "src/dtos/sms.dto";
 import EmailDto from "src/dtos/email.dto";
 import { EmailService } from "./email.service";
-import PushNotificationsService from "./pushNotification.service";
+// import PushNotificationsService from "./pushNotification.service";
 import { PushNotificationDto } from "src/dtos/pushNotification.dto";
 import { Logger } from "@nestjs/common";
 import { ApplicationService } from "./application.service";
@@ -20,41 +20,41 @@ export class MessageService {
         private readonly schedulerRegistry: SchedulerRegistry,
         @InjectRepository(Message)
         private readonly MessageRepo: Repository<Message>,
-        private readonly Sms: SmsService,
+        // private readonly Sms: SmsService,
         private readonly Email: EmailService,
-        private readonly Push: PushNotificationsService,
+        // private readonly Push: PushNotificationsService,
         private readonly App: ApplicationService,
         ) {}
 
-    async sendSMSMessage(sms:smsDto, appId: string) {
+    // async sendSMSMessage(sms:smsDto, appId: string) {
 
-      const app = this.App.getAppByToken(appId);
+    //   const app = this.App.getAppByToken(appId);
 
-      if ((await app).status !== 'INACTIVE') {
+    //   if ((await app).status !== 'INACTIVE') {
         
-        try {
+    //     try {
 
-            const job = new CronJob('* * * * *',async () => {
-                this.logger.log('Send-Sms Job Running')
-                this.Sms.sendSms(sms, appId)
-                const saveMessage = this.MessageRepo.create(sms);
-                await this.MessageRepo.save(saveMessage);
+    //         const job = new CronJob('* * * * *',async () => {
+    //             this.logger.log('Send-Sms Job Running')
+    //             this.Sms.sendSms(sms, appId)
+    //             const saveMessage = this.MessageRepo.create(sms);
+    //             await this.MessageRepo.save(saveMessage);
                 
-            });
+    //         });
     
-            this.schedulerRegistry.addCronJob('send-sms', job);
-            job.start();
-        } catch (error) {
-            this.logger.error(`Failed to create SMS Job for application "${appId}", Dto: ${JSON.stringify(sms)}`, error.stack)
-            throw new InternalServerErrorException('An internal error occured while creating a Job for sending SMS');
-        }
-      }
+    //         this.schedulerRegistry.addCronJob('send-sms', job);
+    //         job.start();
+    //     } catch (error) {
+    //         this.logger.error(`Failed to create SMS Job for application "${appId}", Dto: ${JSON.stringify(sms)}`, error.stack)
+    //         throw new InternalServerErrorException('An internal error occured while creating a Job for sending SMS');
+    //     }
+    //   }
 
-      throw new HttpException('Please Activate Your App', HttpStatus.UNAUTHORIZED)
-    //    return {message: 'Please Activate Your App'}
+    //   throw new HttpException('Please Activate Your App', HttpStatus.UNAUTHORIZED)
+    // //    return {message: 'Please Activate Your App'}
 
     
-    }
+    // }
 
 
     async sendEmailMessageByMinute( minute: number,  mail: EmailDto, appId: string){

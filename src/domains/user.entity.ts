@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Generated, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Application } from "./application.entity";
 import { Exclude } from "class-transformer";
 
@@ -32,5 +32,16 @@ export class User {
     @OneToMany(() => Application, (app: Application) => app.author, {
         cascade: true
     })
-    public apps?: Application[]
+    public apps?: Application[];
+
+    // @Column()
+    // @Generated('uuid')
+    // api_key: string;
+
+    //  @CreateDateColumn({ type: "timestamptz" })
+    // usage: [{
+    //     create_on: Date,
+    //     count: 0
+    // }]
+    
 }

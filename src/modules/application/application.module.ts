@@ -3,10 +3,10 @@ import { ApplicationController } from '../../controllers/application.controller'
 import { ApplicationService } from '../../serviceImpl/application.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Application } from '../../domains/application.entity';
-import { Sms } from 'src/domains/sms.entity';
+// import { Sms } from 'src/domains/sms.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Sms, Application])],
+  imports: [TypeOrmModule.forFeature([ Application])],
   controllers: [ApplicationController],
   providers: [ApplicationService],
   exports: [ApplicationService]
