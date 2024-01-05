@@ -158,6 +158,8 @@ export class NotificationsService {
 
     try {
       const app = await this.appService.getAppByToken(appToken);
+      console.log(app, 'App Data Found!');
+      
 
       if (app.status === "INACTIVE") {
 
@@ -180,7 +182,7 @@ export class NotificationsService {
         return { message: "No New Messages!" };
       }
       let result = await this.mailerService.sendMail(data);
-      console.log(result, "SEND EMAIL RESULT");
+      // console.log(result, "SEND EMAIL RESULT");
 
       //On Success get notification and update status to success!
       //If notifiaction change status and break code execution
@@ -198,11 +200,11 @@ export class NotificationsService {
         recipient: data.to,
         author: app,
         sent_by: result.envelope?.from,
-        body: data.html,
+        body: email.text,
         subject: data.subject,
         provider: "GMAIL",
         status: "SUCCESS",
-        request_data: JSON.stringify(data),
+        request_data: data.html,
         notification_type: "EMAIL",
       });
 
@@ -304,7 +306,13 @@ export class NotificationsService {
   }
 
   async getAllNotificationsInRepo() {
-    return this.notificationsRepo.find();
+    const allNotifs = await this.notificationsRepo.find(
+      
+    );
+    console.log(allNotifs.map((a) => a.author.appName), 'All Notifs');
+
+    return allNotifs
+    
   }
 
   // All Notifications of a specific app

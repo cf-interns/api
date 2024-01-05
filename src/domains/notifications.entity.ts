@@ -26,6 +26,7 @@ export class Notification {
     },
     {
       onDelete: "CASCADE",
+      eager: true
     }
   )
   public author?: Application;
